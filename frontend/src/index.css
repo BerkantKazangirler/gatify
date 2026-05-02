@@ -2,7 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
+	--font-size: 16px;
+	--background: #ffffff;
+	--foreground: #0f1729;
+	--card: #ffffff;
+	--card-foreground: #0f1729;
+	--popover: #ffffff;
+	--popover-foreground: #0f1729;
+	--primary: #0f1729;
+	--primary-foreground: #ffffff;
+	--secondary: #f8fafc;
+	--secondary-foreground: #0f1729;
+	--muted: #f1f5f9;
+	--muted-foreground: #64748b;
+	--accent: #0ea5e9;
+	--accent-foreground: #ffffff;
+	--destructive: #ef4444;
+	--destructive-foreground: #ffffff;
+	--border: #e2e8f0;
+	--input: transparent;
+	--input-background: #f8fafc;
+	--switch-background: #cbd5e1;
+	--font-weight-medium: 500;
+	--font-weight-normal: 400;
+	--ring: #0ea5e9;
+	--chart-1: #0ea5e9;
+	--chart-2: #0f1729;
+	--chart-3: #06b6d4;
+	--chart-4: #64748b;
+	--chart-5: #f59e0b;
+	--radius: 0.75rem;
+	--sidebar: #0f1729;
+	--sidebar-foreground: #ffffff;
+	--sidebar-primary: #0ea5e9;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #1e293b;
+	--sidebar-accent-foreground: #f8fafc;
+	--sidebar-border: #1e293b;
+	--sidebar-ring: #0ea5e9;
+	--navy: #0f1729;
+	--navy-light: #1e293b;
+	--navy-dark: #0a0f1a;
+	--electric-blue: #0ea5e9;
+	--electric-blue-light: #38bdf8;
+	--electric-blue-dark: #0284c7;
+	--success: #10b981;
+	--warning: #f59e0b;
+	--danger: #ef4444;
+
 	color: rgba(248, 250, 252, 0.96);
 	background: #0b1220;
 	font-synthesis: none;
@@ -11,32 +61,113 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-html {
-	scroll-behavior: smooth;
+.dark {
+	--background: #0a0f1a;
+	--foreground: #f8fafc;
+	--card: #0f1729;
+	--card-foreground: #f8fafc;
+	--popover: #0f1729;
+	--popover-foreground: #f8fafc;
+	--primary: #f8fafc;
+	--primary-foreground: #0f1729;
+	--secondary: #1e293b;
+	--secondary-foreground: #f8fafc;
+	--muted: #1e293b;
+	--muted-foreground: #94a3b8;
+	--accent: #0ea5e9;
+	--accent-foreground: #ffffff;
+	--destructive: #ef4444;
+	--destructive-foreground: #ffffff;
+	--border: #1e293b;
+	--input: #1e293b;
+	--ring: #0ea5e9;
+	--font-weight-medium: 500;
+	--font-weight-normal: 400;
+	--chart-1: #0ea5e9;
+	--chart-2: #38bdf8;
+	--chart-3: #06b6d4;
+	--chart-4: #64748b;
+	--chart-5: #f59e0b;
+	--sidebar: #0a0f1a;
+	--sidebar-foreground: #f8fafc;
+	--sidebar-primary: #0ea5e9;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #1e293b;
+	--sidebar-accent-foreground: #f8fafc;
+	--sidebar-border: #1e293b;
+	--sidebar-ring: #0ea5e9;
 }
 
-body {
-	margin: 0;
-	min-width: 320px;
-	min-height: 100vh;
-	background: #0b1220;
-	font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
+@layer base {
+	* {
+		border-color: var(--border);
+		outline-color: var(--ring);
+		outline-width: 50%;
+	}
 
-* {
-	box-sizing: border-box;
-}
+	body {
+		background-color: var(--background);
+		color: var(--foreground);
+	}
 
-a {
-	color: inherit;
-	text-decoration: none;
-}
+	/**
+	* Default typography styles for HTML elements (h1-h4, p, label, button, input).
+	* These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+	*/
 
-button,
-input {
-	font: inherit;
-}
+	html {
+		font-size: var(--font-size);
+		scroll-behavior: smooth;
+	}
 
-::selection {
-	background: rgba(34, 211, 238, 0.28);
+	h1 {
+		font-size: var(--text-2xl);
+		font-weight: var(--font-weight-medium);
+		line-height: 1.5;
+	}
+
+	h2 {
+		font-size: var(--text-xl);
+		font-weight: var(--font-weight-medium);
+		line-height: 1.5;
+	}
+
+	h3 {
+		font-size: var(--text-lg);
+		font-weight: var(--font-weight-medium);
+		line-height: 1.5;
+	}
+
+	h4 {
+		font-size: var(--text-base);
+		font-weight: var(--font-weight-medium);
+		line-height: 1.5;
+	}
+
+	label {
+		font-size: var(--text-base);
+		font-weight: var(--font-weight-medium);
+		line-height: 1.5;
+	}
+
+	button {
+		font-size: var(--text-base);
+		font-weight: var(--font-weight-medium);
+		line-height: 1.5;
+	}
+
+	input {
+		font-size: var(--text-base);
+		font-weight: var(--font-weight-normal);
+		line-height: 1.5;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	::selection {
+		background: rgba(34, 211, 238, 0.28);
+	}
 }
