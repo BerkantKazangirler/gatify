@@ -404,6 +404,7 @@ function MapRoute({
   progress: number;
   hasAlert: boolean;
 }) {
+  console.log({ origin, destination, current, progress, hasAlert });
   return (
     <svg className="w-full h-full" viewBox="0 0 400 200">
       <defs>

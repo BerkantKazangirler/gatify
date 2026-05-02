@@ -11,6 +11,8 @@ export function Profile() {
     newsletter: true,
   });
 
+  console.log(setUserRole);
+
   const toggleNotification = (key: keyof typeof notifications) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
