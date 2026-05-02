@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import productRoutes from "./routes/productRoutes";
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ app.use(
     optionsSuccessStatus: 200,
   }),
 );
+
+app.use("/api/products", productRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.json({
