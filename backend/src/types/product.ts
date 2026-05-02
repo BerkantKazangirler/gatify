@@ -1,21 +1,32 @@
-export interface CustomsRate {
-  origin: "EU" | "NON_EU";
-  taxRate: number;
-  otvRate: number;
-}
-
-export interface PriceComparison {
-  countryCode: string;
-  basePrice: number; // Döviz cinsinden
-  currency: string;
-  shippingFee: number;
-  totalCustoms: number; // TL cinsinden
-  finalPriceTry: number; // Kapıya geliş fiyatı
-}
-
-export interface ProductDetail {
-  eanCode: string;
+export interface CategoryI {
+  id: string;
   name: string;
-  category: "cosmetics" | "electronics" | "other";
-  globalPrices: PriceComparison[];
+  maxLimit: number;
+  priority: number;
+}
+
+export enum RestrictionReason {
+  CUSTOMS_RESTRICTION = "CUSTOMS_RESTRICTION", // Gümrük mevzuatı gereği yasak
+  SHIPPING_NOT_SUPPORTED = "SHIPPING_NOT_SUPPORTED", // Bu ülkeden Türkiye'ye gönderim yok
+  GOVERNMENT_BANNED = "GOVERNMENT_BANNED", // Devlet tarafından tamamen yasaklanmış ürün
+}
+
+export interface NotAvailableI {
+  countryCode: string; // "TR", "DE" vb.
+  reason: RestrictionReason;
+  isBanned: boolean;
+}
+
+export interface ProductsI {
+  id: string;
+  code: string;
+  photo: string;
+  model3D?: string;
+  name: string;
+  description: string;
+  price: string;
+  stock: number;
+  salerId: string;
+  categoryId: string;
+  notAvailable: NotAvailableI[];
 }

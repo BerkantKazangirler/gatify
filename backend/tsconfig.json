@@ -1,20 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "Node16", // Hatanın ana çözümü budur
+    "moduleResolution": "Node16", // Modern Node.js kurallarını uygular
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./", // Kök dizinden itibaren tüm klasörleri (lib, services, src) görür
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "services/**/*", "lib/**/*"], // Tüm kaynak kodları dahil et
   "exclude": ["node_modules", "dist"]
 }
