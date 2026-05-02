@@ -62,6 +62,11 @@ export default {
         normal: "var(--font-weight-normal)",
         medium: "var(--font-weight-medium)",
       },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+        "space-grotesk": ["Space Grotesk", "sans-serif"],
+        gilroy: ["Gilroy", "sans-serif"],
+      },
     },
   },
   plugins: [],

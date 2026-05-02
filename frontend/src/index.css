@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Gilroy:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -108,6 +110,7 @@
 	body {
 		background-color: var(--background);
 		color: var(--foreground);
+		font-family: 'Poppins', sans-serif;
 	}
 
 	/**
@@ -121,12 +124,14 @@
 	}
 
 	h1 {
+		font-family: 'Space Grotesk', sans-serif;
 		font-size: var(--text-2xl);
 		font-weight: var(--font-weight-medium);
 		line-height: 1.5;
 	}
 
 	h2 {
+		font-family: 'Space Grotesk', sans-serif;
 		font-size: var(--text-xl);
 		font-weight: var(--font-weight-medium);
 		line-height: 1.5;

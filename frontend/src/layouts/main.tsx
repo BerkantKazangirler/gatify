@@ -1,14 +1,50 @@
 import { Outlet, useLocation, Link } from "react-router";
 import { Package, LayoutDashboard, Search, MapPin, Settings, Store, FileText, HelpCircle, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import classNames from "classnames";
 
 export function RootLayout() {
   const location = useLocation();
   const [isLoggedIn] = useState(true);
   const [userRole] = useState<"buyer" | "seller" | "admin">("buyer");
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
-  const isGuestPage = location.pathname === "/" || location.pathname === "/help" || location.pathname === "/support";
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Check if user scrolled down or up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - hide header
+        setShowHeader(false);
+      } else {
+        // Scrolling up - show header
+        setShowHeader(true);
+      }
+
+      // Check if not at top
+      setIsScrolled(currentScrollY > 0);
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/register";
+  const isGuestPage =
+    location.pathname === "/" ||
+    location.pathname === "/products" ||
+    location.pathname.startsWith("/products/") ||
+    location.pathname === "/help" ||
+    location.pathname === "/support";
+  const shouldAutoHideGuestHeader =
+    location.pathname === "/" ||
+    location.pathname === "/help" ||
+    location.pathname === "/support";
   const isAdminPage = location.pathname.startsWith("/admin");
   const isSellerPage = location.pathname.startsWith("/seller");
 
@@ -21,21 +57,43 @@ export function RootLayout() {
   if (isGuestPage) {
     return (
       <div className="min-h-screen bg-white">
-        <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <header
+          className={`sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${
+            shouldAutoHideGuestHeader && !showHeader
+              ? "-translate-y-full"
+              : "translate-y-0"
+          }`}
+        >
           <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <Package className="w-8 h-8 text-[var(--electric-blue)]" />
-              <span className="text-2xl text-[var(--navy)]">Gatify</span>
+              <Package
+                className={classNames("w-8 transition-all duration-300 h-8", {
+                  "text-[var(--electric-blue)]": !isScrolled,
+                  "text-gray-400": isScrolled,
+                })}
+              />
+              <span className="text-2xl font-space-grotesk text-[var(--navy)]">
+                Gatify
+              </span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
-              <Link to="/products" className="text-gray-600 hover:text-[var(--navy)] transition-colors">
+              <Link
+                to="/products"
+                className="text-gray-600 hover:text-[var(--navy)] transition-colors"
+              >
                 Products
               </Link>
-              <Link to="/help" className="text-gray-600 hover:text-[var(--navy)] transition-colors">
+              <Link
+                to="/help"
+                className="text-gray-600 hover:text-[var(--navy)] transition-colors"
+              >
                 Help Center
               </Link>
-              <Link to="/support" className="text-gray-600 hover:text-[var(--navy)] transition-colors">
+              <Link
+                to="/support"
+                className="text-gray-600 hover:text-[var(--navy)] transition-colors"
+              >
                 Support
               </Link>
             </nav>
@@ -66,38 +124,89 @@ export function RootLayout() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Package className="w-6 h-6 text-[var(--electric-blue)]" />
-                  <span className="text-xl">Gatify</span>
+                  <Package
+                    className={classNames("w-6 h-6", {
+                      "text-[var(--electric-blue)]": lastScrollY == 0,
+                      "text-gray-400": lastScrollY > 0,
+                    })}
+                  />
+                  <span className="text-xl font-space-grotesk">Gatify</span>
                 </div>
                 <p className="text-gray-400 text-sm">
-                  Global commerce made simple with automated customs and price arbitrage.
+                  Global commerce made simple with automated customs and price
+                  arbitrage.
                 </p>
               </div>
 
               <div>
-                <h3 className="mb-4">Platform</h3>
+                <h3 className="mb-4 font-space-grotesk">Platform</h3>
                 <div className="space-y-2 text-sm text-gray-400">
-                  <Link to="/products" className="block hover:text-white transition-colors">Browse Products</Link>
-                  <Link to="/help" className="block hover:text-white transition-colors">How It Works</Link>
-                  <Link to="/register" className="block hover:text-white transition-colors">Become a Seller</Link>
+                  <Link
+                    to="/products"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Browse Products
+                  </Link>
+                  <Link
+                    to="/help"
+                    className="block hover:text-white transition-colors"
+                  >
+                    How It Works
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Become a Seller
+                  </Link>
                 </div>
               </div>
 
               <div>
-                <h3 className="mb-4">Support</h3>
+                <h3 className="mb-4 font-space-grotesk">Support</h3>
                 <div className="space-y-2 text-sm text-gray-400">
-                  <Link to="/help" className="block hover:text-white transition-colors">FAQ</Link>
-                  <Link to="/support" className="block hover:text-white transition-colors">Contact Us</Link>
-                  <a href="#" className="block hover:text-white transition-colors">Customs Guide</a>
+                  <Link
+                    to="/help"
+                    className="block hover:text-white transition-colors"
+                  >
+                    FAQ
+                  </Link>
+                  <Link
+                    to="/support"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Contact Us
+                  </Link>
+                  <a
+                    href="#"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Customs Guide
+                  </a>
                 </div>
               </div>
 
               <div>
-                <h3 className="mb-4">Legal</h3>
+                <h3 className="mb-4 font-space-grotesk">Legal</h3>
                 <div className="space-y-2 text-sm text-gray-400">
-                  <a href="#" className="block hover:text-white transition-colors">Terms of Service</a>
-                  <a href="#" className="block hover:text-white transition-colors">Privacy Policy</a>
-                  <a href="#" className="block hover:text-white transition-colors">Cookie Policy</a>
+                  <a
+                    href="#"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Terms of Service
+                  </a>
+                  <a
+                    href="#"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Privacy Policy
+                  </a>
+                  <a
+                    href="#"
+                    className="block hover:text-white transition-colors"
+                  >
+                    Cookie Policy
+                  </a>
                 </div>
               </div>
             </div>
@@ -117,57 +226,136 @@ export function RootLayout() {
         <aside className="w-64 bg-[var(--navy)] text-white flex flex-col">
           <div className="p-6 border-b border-[var(--navy-light)]">
             <Link to="/" className="flex items-center gap-3">
-              <Package className="w-8 h-8 text-[var(--electric-blue)]" />
-              <h1 className="text-2xl">Gatify</h1>
+              <Package
+                className={classNames("w-8 h-8", {
+                  "text-[var(--electric-blue)]": lastScrollY == 0,
+                  "text-gray-400": lastScrollY > 0,
+                })}
+              />
+              <h1 className="text-2xl font-space-grotesk">Gatify</h1>
             </Link>
             <p className="text-sm text-gray-400 mt-1">
-              {isSellerPage ? "Seller Portal" : isAdminPage ? "Admin Panel" : "Global Trade Platform"}
+              {isSellerPage
+                ? "Seller Portal"
+                : isAdminPage
+                  ? "Admin Panel"
+                  : "Global Trade Platform"}
             </p>
           </div>
 
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {isAdminPage ? (
               <>
-                <NavLink to="/admin" icon={<Settings className="w-5 h-5" />} label="Admin Panel" active={location.pathname === "/admin"} />
-                <NavLink to="/dashboard" icon={<LayoutDashboard className="w-5 h-5" />} label="Back to Dashboard" active={false} />
+                <NavLink
+                  to="/admin"
+                  icon={<Settings className="w-5 h-5" />}
+                  label="Admin Panel"
+                  active={location.pathname === "/admin"}
+                />
+                <NavLink
+                  to="/dashboard"
+                  icon={<LayoutDashboard className="w-5 h-5" />}
+                  label="Back to Dashboard"
+                  active={false}
+                />
               </>
             ) : isSellerPage ? (
               <>
-                <NavLink to="/seller" icon={<Store className="w-5 h-5" />} label="Seller Dashboard" active={location.pathname === "/seller"} />
-                <NavLink to="/seller/products/new" icon={<Package className="w-5 h-5" />} label="Add Product" active={location.pathname.includes("/products/")} />
-                <NavLink to="/seller/export-docs" icon={<FileText className="w-5 h-5" />} label="Export Docs" active={location.pathname === "/seller/export-docs"} />
+                <NavLink
+                  to="/seller"
+                  icon={<Store className="w-5 h-5" />}
+                  label="Seller Dashboard"
+                  active={location.pathname === "/seller"}
+                />
+                <NavLink
+                  to="/seller/products/new"
+                  icon={<Package className="w-5 h-5" />}
+                  label="Add Product"
+                  active={location.pathname.includes("/products/")}
+                />
+                <NavLink
+                  to="/seller/export-docs"
+                  icon={<FileText className="w-5 h-5" />}
+                  label="Export Docs"
+                  active={location.pathname === "/seller/export-docs"}
+                />
                 <div className="my-4 border-t border-[var(--navy-light)]" />
-                <NavLink to="/dashboard" icon={<LayoutDashboard className="w-5 h-5" />} label="Buyer Dashboard" active={false} />
+                <NavLink
+                  to="/dashboard"
+                  icon={<LayoutDashboard className="w-5 h-5" />}
+                  label="Buyer Dashboard"
+                  active={false}
+                />
               </>
             ) : (
               <>
-                <NavLink to="/dashboard" icon={<LayoutDashboard className="w-5 h-5" />} label="Dashboard" active={location.pathname === "/dashboard"} />
-                <NavLink to="/products" icon={<Search className="w-5 h-5" />} label="Discover Products" active={location.pathname.startsWith("/products")} />
-                <NavLink to="/tracking" icon={<MapPin className="w-5 h-5" />} label="Track Shipments" active={location.pathname === "/tracking"} />
+                <NavLink
+                  to="/dashboard"
+                  icon={<LayoutDashboard className="w-5 h-5" />}
+                  label="Dashboard"
+                  active={location.pathname === "/dashboard"}
+                />
+                <NavLink
+                  to="/products"
+                  icon={<Search className="w-5 h-5" />}
+                  label="Discover Products"
+                  active={location.pathname.startsWith("/products")}
+                />
+                <NavLink
+                  to="/tracking"
+                  icon={<MapPin className="w-5 h-5" />}
+                  label="Track Shipments"
+                  active={location.pathname === "/tracking"}
+                />
                 {userRole === "seller" && (
                   <>
                     <div className="my-4 border-t border-[var(--navy-light)]" />
-                    <NavLink to="/seller" icon={<Store className="w-5 h-5" />} label="Seller Portal" active={false} />
+                    <NavLink
+                      to="/seller"
+                      icon={<Store className="w-5 h-5" />}
+                      label="Seller Portal"
+                      active={false}
+                    />
                   </>
                 )}
                 {userRole === "admin" && (
-                  <NavLink to="/admin" icon={<Settings className="w-5 h-5" />} label="Admin Panel" active={false} />
+                  <NavLink
+                    to="/admin"
+                    icon={<Settings className="w-5 h-5" />}
+                    label="Admin Panel"
+                    active={false}
+                  />
                 )}
                 <div className="my-4 border-t border-[var(--navy-light)]" />
-                <NavLink to="/help" icon={<HelpCircle className="w-5 h-5" />} label="Help Center" active={location.pathname === "/help"} />
-                <NavLink to="/support" icon={<FileText className="w-5 h-5" />} label="Support" active={location.pathname === "/support"} />
+                <NavLink
+                  to="/help"
+                  icon={<HelpCircle className="w-5 h-5" />}
+                  label="Help Center"
+                  active={location.pathname === "/help"}
+                />
+                <NavLink
+                  to="/support"
+                  icon={<FileText className="w-5 h-5" />}
+                  label="Support"
+                  active={location.pathname === "/support"}
+                />
               </>
             )}
           </nav>
 
           <div className="p-4 border-t border-[var(--navy-light)]">
-            <Link to="/profile" className="flex items-center gap-3 hover:bg-[var(--navy-light)] rounded-xl p-2 transition-colors">
+            <Link
+              to="/profile"
+              className="flex items-center gap-3 hover:bg-[var(--navy-light)] rounded-xl p-2 transition-colors"
+            >
               <div className="w-10 h-10 rounded-full bg-[var(--electric-blue)] flex items-center justify-center">
                 <User className="w-5 h-5" />
               </div>
               <div className="flex-1">
                 <p className="text-sm">User Account</p>
-                <p className="text-xs text-gray-400 capitalize">{userRole} Role</p>
+                <p className="text-xs text-gray-400 capitalize">
+                  {userRole} Role
+                </p>
               </div>
             </Link>
           </div>

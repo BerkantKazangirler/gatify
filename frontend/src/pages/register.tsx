@@ -33,11 +33,15 @@ export function Register() {
 
         <div className="bg-white rounded-xl p-8 shadow-2xl">
           <h2 className="text-2xl mb-2 text-[var(--navy)]">Create Account</h2>
-          <p className="text-gray-600 mb-6">Join thousands of cross-border shoppers</p>
+          <p className="text-gray-600 mb-6">
+            Join thousands of cross-border shoppers
+          </p>
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block mb-2 text-sm text-gray-700">Full Name</label>
+              <label className="block mb-2 text-sm text-gray-700">
+                Full Name
+              </label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -52,7 +56,9 @@ export function Register() {
             </div>
 
             <div>
-              <label className="block mb-2 text-sm text-gray-700">Email Address</label>
+              <label className="block mb-2 text-sm text-gray-700">
+                Email Address
+              </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -67,7 +73,9 @@ export function Register() {
             </div>
 
             <div>
-              <label className="block mb-2 text-sm text-gray-700">Password</label>
+              <label className="block mb-2 text-sm text-gray-700">
+                Password
+              </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -105,7 +113,10 @@ export function Register() {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800">
               <p className="flex items-start gap-2">
                 <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span>Your ID is encrypted and used only for customs verification. This speeds up clearance by 60%.</span>
+                <span>
+                  Your ID is encrypted and used only for customs verification.
+                  This speeds up clearance by 60%.
+                </span>
               </p>
             </div>
 
@@ -120,7 +131,10 @@ export function Register() {
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <Link to="/" className="text-[var(--electric-blue)] hover:underline">
+            <Link
+              to="/login"
+              className="text-[var(--electric-blue)] hover:underline"
+            >
               Sign In
             </Link>
           </div>
