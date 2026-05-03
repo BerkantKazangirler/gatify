@@ -2,9 +2,11 @@ import { Link, useNavigate } from "react-router";
 import { Package, Mail, Lock, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { loginUserApi } from "../utils/authApi";
+import { useAuth } from "../context/AuthContext";
 
 export function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -17,9 +19,9 @@ export function Login() {
 
     try {
       const response = await loginUserApi(email, password);
-      // Örneğin { token: "...", user: {...} } döner, token'ı localStorage'a kaydedebiliriz:
-      if (response.token) localStorage.setItem("gatify_token", response.token);
-
+      if (response.token && response.user) {
+        login(response.user, response.token);
+      }
       navigate("/dashboard");
     } catch (err: any) {
       console.error(err);

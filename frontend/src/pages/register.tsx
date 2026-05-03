@@ -1,10 +1,20 @@
 import { Link, useNavigate } from "react-router";
-import { Package, Mail, Lock, User, CreditCard, ArrowRight, Shield } from "lucide-react";
+import {
+  Package,
+  Mail,
+  Lock,
+  User,
+  CreditCard,
+  ArrowRight,
+  Shield,
+} from "lucide-react";
 import { useState } from "react";
 import { registerUserApi } from "../utils/authApi";
+import { useAuth } from "../context/AuthContext";
 
 export function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,12 +30,42 @@ export function Register() {
     setLoading(true);
 
     try {
-      await registerUserApi({
+      const response = await registerUserApi({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         citizenId: formData.citizenId,
       });
+
+      // Backend /auth/register returns user doc; then login the user
+      // We need to also get a token — call login endpoint after register
+      const loginResponse = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        },
+      );
+      const loginData = await loginResponse.json();
+
+      if (loginData.token && loginData.user) {
+        login(loginData.user, loginData.token);
+      } else if (response) {
+        // Fallback: use register response data without token
+        login(
+          {
+            uid: response.uid,
+            name: response.name,
+            email: response.email,
+            role: response.role,
+          },
+          "",
+        );
+      }
 
       navigate("/dashboard");
     } catch (err: any) {

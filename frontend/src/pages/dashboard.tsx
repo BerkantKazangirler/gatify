@@ -35,8 +35,10 @@ export function Dashboard() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [arbitrageDeals, setArbitrageDeals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetchAllProducts()
       .then((products) => {
         if (products && products.length > 0) {
@@ -58,15 +60,22 @@ export function Dashboard() {
           setArbitrageDeals(dynamicDeals.slice(0, 4));
         }
       })
-      .catch((err) => console.error("API error:", err));
+      .catch((err) => console.error("API error:", err))
+      .finally(() => setLoading(false));
   }, []);
+
+  // Greeting by time of day
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12 ? "Günaydın" : hour < 18 ? "İyi günler" : "İyi akşamlar";
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-r from-[var(--navy)] to-[var(--navy-light)] text-white p-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl mb-2">
-            Tekrar hoş geldin{user?.name ? `, ${user.name}` : ""}!
+            {greeting}
+            {user?.name ? `, ${user.name.split(" ")[0]}` : ""}! 👋
           </h1>
           <p className="text-gray-300 mb-6">
             Küresel fırsatları keşfet ve gönderilerini takip et
@@ -84,18 +93,14 @@ export function Dashboard() {
           </div>
 
           <div className="flex gap-4 mt-4">
-            <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Elektronik
-            </button>
-            <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Moda
-            </button>
-            <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Ev & Bahçe
-            </button>
-            <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Spor
-            </button>
+            {["Elektronik", "Moda", "Ev & Bahçe", "Spor"].map((cat) => (
+              <button
+                key={cat}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm"
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -111,16 +116,16 @@ export function Dashboard() {
           />
           <StatCard
             icon={<Package className="w-6 h-6" />}
-            label="Active Shipments"
+            label="Aktif Gönderiler"
             value="3"
-            description="2 arriving this week"
+            description="2 bu hafta geliyor"
             color="blue"
           />
           <StatCard
             icon={<DollarSign className="w-6 h-6" />}
-            label="Total Saved"
+            label="Toplam Tasarruf"
             value="$1,247"
-            description="Last 6 months"
+            description="Son 6 ay"
             color="purple"
           />
         </div>
@@ -128,73 +133,94 @@ export function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl text-[var(--navy)]">
-              🔥 Top Price Arbitrage Opportunities
+              🔥 En İyi Fiyat Avantajı Fırsatları
             </h2>
             <Link
               to="/products"
               className="text-[var(--electric-blue)] hover:underline flex items-center gap-1"
             >
-              View All <ArrowRight className="w-4 h-4" />
+              Tümünü Gör <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {arbitrageDeals.map((deal) => (
-              <Link
-                key={deal.id}
-                to={`/products/${deal.id}`}
-                className="bg-white rounded-xl p-6 border border-gray-200 hover:border-[var(--electric-blue)] hover:shadow-lg transition-all cursor-pointer"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="flex-1 text-[var(--navy)]">{deal.product}</h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs ${
-                      deal.risk === "Low"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {deal.risk} Risk
-                  </span>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl p-6 border border-gray-200 animate-pulse"
+                >
+                  <div className="h-5 bg-gray-200 rounded mb-3 w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded mb-4 w-1/2" />
+                  <div className="h-8 bg-gray-200 rounded w-1/3" />
                 </div>
-
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                  <MapPin className="w-4 h-4" />
-                  <span>Ship from {deal.country}</span>
-                </div>
-
-                <div className="flex items-end justify-between">
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">
-                      Global Price
-                    </div>
-                    <div className="text-2xl text-[var(--electric-blue)]">
-                      ${deal.globalPrice}
-                    </div>
+              ))}
+            </div>
+          ) : arbitrageDeals.length === 0 ? (
+            <div className="bg-white rounded-xl p-8 border border-gray-200 text-center text-gray-500">
+              Ürün bulunamadı. Lütfen backend'in çalıştığından emin olun.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {arbitrageDeals.map((deal) => (
+                <Link
+                  key={deal.id}
+                  to={`/products/${deal.id}`}
+                  className="bg-white rounded-xl p-6 border border-gray-200 hover:border-[var(--electric-blue)] hover:shadow-lg transition-all cursor-pointer"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="flex-1 text-[var(--navy)]">
+                      {deal.product}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs ${
+                        deal.risk === "Low"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {deal.risk} Risk
+                    </span>
                   </div>
 
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500 line-through">
-                      ${deal.localPrice}
+                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                    <MapPin className="w-4 h-4" />
+                    <span>{deal.country} çıkışlı</span>
+                  </div>
+
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">
+                        Küresel Fiyat
+                      </div>
+                      <div className="text-2xl text-[var(--electric-blue)]">
+                        ${deal.globalPrice}
+                      </div>
                     </div>
-                    <div className="text-lg text-green-600">
-                      Save ${deal.savings} ({deal.savingsPercent}%)
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500 line-through">
+                        ${Math.round(deal.localPrice)}
+                      </div>
+                      <div className="text-lg text-green-600">
+                        ${Math.round(deal.savings)} tasarruf (
+                        {deal.savingsPercent}%)
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl text-[var(--navy)]">Active Shipments</h2>
+            <h2 className="text-2xl text-[var(--navy)]">Aktif Gönderiler</h2>
             <Link
               to="/tracking"
               className="text-[var(--electric-blue)] hover:underline flex items-center gap-1"
             >
-              Track All <ArrowRight className="w-4 h-4" />
+              Tümünü Takip Et <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -239,7 +265,7 @@ export function Dashboard() {
                     />
                   </div>
                   <div className="text-xs text-gray-500 mt-1 text-right">
-                    {shipment.progress}% Complete
+                    {shipment.progress}% Tamamlandı
                   </div>
                 </div>
               </div>
@@ -251,7 +277,13 @@ export function Dashboard() {
   );
 }
 
-function StatCard({ icon, label, value, description, color }: {
+function StatCard({
+  icon,
+  label,
+  value,
+  description,
+  color,
+}: {
   icon: React.ReactNode;
   label: string;
   value: string;
@@ -266,7 +298,9 @@ function StatCard({ icon, label, value, description, color }: {
 
   return (
     <div className="bg-white rounded-xl p-6 border border-gray-200">
-      <div className={`w-12 h-12 rounded-xl ${colorClasses[color]} flex items-center justify-center mb-4`}>
+      <div
+        className={`w-12 h-12 rounded-xl ${colorClasses[color]} flex items-center justify-center mb-4`}
+      >
         {icon}
       </div>
       <div className="text-sm text-gray-600 mb-1">{label}</div>

@@ -1,39 +1,56 @@
-import { Outlet, useLocation, Link } from "react-router";
-import { Package, LayoutDashboard, Search, MapPin, Settings, Store, FileText, HelpCircle, User } from "lucide-react";
+import { Outlet, useLocation, Link, useNavigate } from "react-router";
+import {
+  Package,
+  LayoutDashboard,
+  Search,
+  MapPin,
+  Settings,
+  Store,
+  FileText,
+  HelpCircle,
+  User,
+  LogOut,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import classNames from "classnames";
 import { useAuth } from "../context/AuthContext";
 
 export function RootLayout() {
   const location = useLocation();
-  const { user } = useAuth();
-  const [isLoggedIn] = useState(true);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [userRole] = useState<"buyer" | "seller" | "admin">("buyer");
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      // Kullanıcı aşağı mı yukarı mı kaydırdı kontrol et
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Aşağı kaydırıyorsa başlığı gizle
         setShowHeader(false);
       } else {
-        // Yukarı kaydırıyorsa başlığı göster
         setShowHeader(true);
       }
-
-      // En üstte olup olmadığını kontrol et
       setIsScrolled(currentScrollY > 0);
       setLastScrollY(currentScrollY);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClick = () => setShowUserMenu(false);
+    if (showUserMenu) document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [showUserMenu]);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";
@@ -50,11 +67,21 @@ export function RootLayout() {
   const isAdminPage = location.pathname.startsWith("/admin");
   const isSellerPage = location.pathname.startsWith("/seller");
 
-  const showSidebar = !isAuthPage && !isGuestPage && isLoggedIn;
+  const showSidebar = !isAuthPage && !isGuestPage && !!user;
 
   if (isAuthPage) {
     return <Outlet />;
   }
+
+  // User initials for avatar
+  const userInitials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "U";
 
   if (isGuestPage) {
     return (
@@ -101,15 +128,49 @@ export function RootLayout() {
             </nav>
 
             {user ? (
-              <Link
-                to="/profile"
-                className="flex items-center gap-3 hover:bg-gray-100 rounded-xl p-2 transition-colors"
-              >
-                <div className="w-10 h-10 rounded-full bg-[var(--electric-blue)] flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm text-gray-700">{user.name}</span>
-              </Link>
+              <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowUserMenu(!showUserMenu);
+                  }}
+                  className="flex items-center gap-3 hover:bg-gray-100 rounded-xl px-3 py-2 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[var(--electric-blue)] flex items-center justify-center text-white text-sm font-medium">
+                    {userInitials}
+                  </div>
+                  <span className="text-sm text-gray-700 hidden sm:block">
+                    {user.name}
+                  </span>
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Panel
+                    </Link>
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <User className="w-4 h-4" />
+                      Profil
+                    </Link>
+                    <hr className="my-1 border-gray-200" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Çıkış Yap
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex items-center gap-3">
                 <Link
@@ -138,12 +199,7 @@ export function RootLayout() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Package
-                    className={classNames("w-6 h-6", {
-                      "text-[var(--electric-blue)]": lastScrollY == 0,
-                      "text-gray-400": lastScrollY > 0,
-                    })}
-                  />
+                  <Package className="w-6 h-6 text-[var(--electric-blue)]" />
                   <span className="text-xl font-space-grotesk">Gatify</span>
                 </div>
                 <p className="text-gray-400 text-sm">
@@ -234,18 +290,14 @@ export function RootLayout() {
     );
   }
 
+  // App layout with sidebar (authenticated pages)
   return (
     <div className="flex h-screen bg-background">
       {showSidebar && (
         <aside className="w-64 bg-[var(--navy)] text-white flex flex-col">
           <div className="p-6 border-b border-[var(--navy-light)]">
             <Link to="/" className="flex items-center gap-3">
-              <Package
-                className={classNames("w-8 h-8", {
-                  "text-[var(--electric-blue)]": lastScrollY == 0,
-                  "text-gray-400": lastScrollY > 0,
-                })}
-              />
+              <Package className="w-8 h-8 text-[var(--electric-blue)]" />
               <h1 className="text-2xl font-space-grotesk">Gatify</h1>
             </Link>
             <p className="text-sm text-gray-400 mt-1">
@@ -344,46 +396,85 @@ export function RootLayout() {
                 <NavLink
                   to="/help"
                   icon={<HelpCircle className="w-5 h-5" />}
-                  label="Help Center"
+                  label="Yardım Merkezi"
                   active={location.pathname === "/help"}
                 />
                 <NavLink
                   to="/support"
                   icon={<FileText className="w-5 h-5" />}
-                  label="Support"
+                  label="Destek"
                   active={location.pathname === "/support"}
                 />
               </>
             )}
           </nav>
 
+          {/* Sidebar user section */}
           <div className="p-4 border-t border-[var(--navy-light)]">
             <Link
               to="/profile"
-              className="flex items-center gap-3 hover:bg-[var(--navy-light)] rounded-xl p-2 transition-colors"
+              className="flex items-center gap-3 hover:bg-[var(--navy-light)] rounded-xl p-2 transition-colors mb-2"
             >
-              <div className="w-10 h-10 rounded-full bg-[var(--electric-blue)] flex items-center justify-center">
-                <User className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-full bg-[var(--electric-blue)] flex items-center justify-center text-white text-sm font-medium">
+                {userInitials}
               </div>
-              <div className="flex-1">
-                <p className="text-sm">User Account</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm truncate">{user?.name || "Kullanıcı"}</p>
                 <p className="text-xs text-gray-400 capitalize">
-                  {userRole} Role
+                  {user?.role || userRole}
                 </p>
               </div>
             </Link>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors text-sm"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Çıkış Yap</span>
+            </button>
           </div>
         </aside>
       )}
 
       <main className="flex-1 overflow-auto">
-        <Outlet />
+        {/* If not logged in and trying to access protected page, show login prompt */}
+        {!user && !isGuestPage && !isAuthPage ? (
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <Package className="w-16 h-16 text-[var(--electric-blue)] mx-auto mb-4" />
+              <h2 className="text-2xl text-[var(--navy)] mb-2">
+                Giriş Yapmanız Gerekiyor
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Bu sayfayı görüntülemek için lütfen giriş yapın.
+              </p>
+              <Link
+                to="/login"
+                className="px-6 py-3 bg-[var(--electric-blue)] text-white rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors"
+              >
+                Giriş Yap
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   );
 }
 
-function NavLink({ to, icon, label, active }: { to: string; icon: React.ReactNode; label: string; active: boolean }) {
+function NavLink({
+  to,
+  icon,
+  label,
+  active,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+}) {
   return (
     <Link
       to={to}
