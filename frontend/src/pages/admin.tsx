@@ -90,27 +90,29 @@ export function AdminPanel() {
           <div className="flex items-center gap-3 mb-4">
             <Settings className="w-10 h-10" />
             <div>
-              <h1 className="text-3xl mb-1">Admin Panel</h1>
-              <p className="text-gray-300">Global platform management & regulatory compliance</p>
+              <h1 className="text-3xl mb-1">Yönetici Paneli</h1>
+              <p className="text-gray-300">
+                Küresel platform yönetimi ve düzenleyici uyumluluk
+              </p>
             </div>
           </div>
 
           <div className="flex gap-4 mt-6">
             <TabButton
               icon={<DollarSign className="w-5 h-5" />}
-              label="Global Rates Manager"
+              label="Küresel Oranlar"
               active={activeTab === "rates"}
               onClick={() => setActiveTab("rates")}
             />
             <TabButton
               icon={<Globe className="w-5 h-5" />}
-              label="Regulatory Watch"
+              label="Regülasyon Takibi"
               active={activeTab === "regulatory"}
               onClick={() => setActiveTab("regulatory")}
             />
             <TabButton
               icon={<Users className="w-5 h-5" />}
-              label="User Support"
+              label="Kullanıcı Desteği"
               active={activeTab === "support"}
               onClick={() => setActiveTab("support")}
             />
@@ -123,8 +125,12 @@ export function AdminPanel() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl text-[var(--navy)] mb-2">Global Rates Manager</h2>
-                <p className="text-gray-600">Update customs tax percentages and shipping costs</p>
+                <h2 className="text-2xl text-[var(--navy)] mb-2">
+                  Küresel Oranlar
+                </h2>
+                <p className="text-gray-600">
+                  Gümrük vergi yüzdelerini ve kargo maliyetlerini güncelle
+                </p>
               </div>
               <button
                 onClick={() => setEditingRates(!editingRates)}
@@ -137,12 +143,12 @@ export function AdminPanel() {
                 {editingRates ? (
                   <>
                     <Save className="w-5 h-5" />
-                    <span>Save Changes</span>
+                    <span>Değişiklikleri Kaydet</span>
                   </>
                 ) : (
                   <>
                     <Settings className="w-5 h-5" />
-                    <span>Edit Rates</span>
+                    <span>Oranları Düzenle</span>
                   </>
                 )}
               </button>
@@ -150,23 +156,37 @@ export function AdminPanel() {
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-6 border-b border-gray-200 bg-gray-50">
-                <h3 className="text-lg text-[var(--navy)]">Customs & Tax Rates</h3>
+                <h3 className="text-lg text-[var(--navy)]">
+                  Gümrük ve Vergi Oranları
+                </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Country</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Customs Tax (%)</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">VAT (%)</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Last Updated</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Actions</th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        Ülke
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        Gümrük Vergisi (%)
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        KDV (%)
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        Son Güncelleme
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        İşlemler
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {customsRates.map((rate, index) => (
                       <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-[var(--navy)]">{rate.country}</td>
+                        <td className="px-6 py-4 text-[var(--navy)]">
+                          {rate.country}
+                        </td>
                         <td className="px-6 py-4">
                           {editingRates ? (
                             <input
@@ -175,7 +195,9 @@ export function AdminPanel() {
                               className="w-20 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                             />
                           ) : (
-                            <span className="text-[var(--navy)]">{rate.customs}%</span>
+                            <span className="text-[var(--navy)]">
+                              {rate.customs}%
+                            </span>
                           )}
                         </td>
                         <td className="px-6 py-4">
@@ -186,13 +208,17 @@ export function AdminPanel() {
                               className="w-20 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                             />
                           ) : (
-                            <span className="text-[var(--navy)]">{rate.vat}%</span>
+                            <span className="text-[var(--navy)]">
+                              {rate.vat}%
+                            </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-gray-600 text-sm">{rate.lastUpdated}</td>
+                        <td className="px-6 py-4 text-gray-600 text-sm">
+                          {rate.lastUpdated}
+                        </td>
                         <td className="px-6 py-4">
                           <button className="text-[var(--electric-blue)] hover:underline text-sm">
-                            View History
+                            Geçmişi Görüntüle
                           </button>
                         </td>
                       </tr>
@@ -204,22 +230,34 @@ export function AdminPanel() {
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-6 border-b border-gray-200 bg-gray-50">
-                <h3 className="text-lg text-[var(--navy)]">Shipping Rates (USD)</h3>
+                <h3 className="text-lg text-[var(--navy)]">
+                  Kargo Oranları (USD)
+                </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Route</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Air Freight</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Sea Freight</th>
-                      <th className="px-6 py-3 text-left text-sm text-gray-600">Actions</th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        Rota
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        Hava Kargosu
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        Deniz Kargosu
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm text-gray-600">
+                        İşlemler
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {shippingRates.map((rate, index) => (
                       <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-[var(--navy)]">{rate.route}</td>
+                        <td className="px-6 py-4 text-[var(--navy)]">
+                          {rate.route}
+                        </td>
                         <td className="px-6 py-4">
                           {editingRates ? (
                             <input
@@ -228,7 +266,9 @@ export function AdminPanel() {
                               className="w-24 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                             />
                           ) : (
-                            <span className="text-[var(--navy)]">${rate.air}</span>
+                            <span className="text-[var(--navy)]">
+                              ${rate.air}
+                            </span>
                           )}
                         </td>
                         <td className="px-6 py-4">
@@ -239,12 +279,14 @@ export function AdminPanel() {
                               className="w-24 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                             />
                           ) : (
-                            <span className="text-[var(--navy)]">${rate.sea}</span>
+                            <span className="text-[var(--navy)]">
+                              ${rate.sea}
+                            </span>
                           )}
                         </td>
                         <td className="px-6 py-4">
                           <button className="text-[var(--electric-blue)] hover:underline text-sm">
-                            Adjust
+                            Ayarla
                           </button>
                         </td>
                       </tr>
@@ -259,26 +301,31 @@ export function AdminPanel() {
         {activeTab === "regulatory" && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl text-[var(--navy)] mb-2">Regulatory Watch</h2>
-              <p className="text-gray-600">Monitor global trade law changes and compliance requirements</p>
+              <h2 className="text-2xl text-[var(--navy)] mb-2">
+                Regülasyon Takibi
+              </h2>
+              <p className="text-gray-600">
+                Küresel ticaret hukuku değişikliklerini ve uyumluluk
+                gereksinimlerini izle
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <StatCard
                 icon={<AlertCircle className="w-6 h-6" />}
-                label="Active Alerts"
+                label="Aktif Uyarılar"
                 value="3"
                 color="red"
               />
               <StatCard
                 icon={<TrendingUp className="w-6 h-6" />}
-                label="Rate Changes"
+                label="Oran Değişiklikleri"
                 value="12"
                 color="blue"
               />
               <StatCard
                 icon={<FileText className="w-6 h-6" />}
-                label="Updates (30d)"
+                label="Güncellemeler (30g)"
                 value="47"
                 color="green"
               />
@@ -292,27 +339,31 @@ export function AdminPanel() {
                     update.severity === "high"
                       ? "border-red-200"
                       : update.severity === "medium"
-                      ? "border-yellow-200"
-                      : "border-blue-200"
+                        ? "border-yellow-200"
+                        : "border-blue-200"
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg text-[var(--navy)]">{update.title}</h3>
+                        <h3 className="text-lg text-[var(--navy)]">
+                          {update.title}
+                        </h3>
                         <span
                           className={`px-3 py-1 rounded-full text-xs ${
                             update.severity === "high"
                               ? "bg-red-100 text-red-700"
                               : update.severity === "medium"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-blue-100 text-blue-700"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-blue-100 text-blue-700"
                           }`}
                         >
                           {update.impact} Impact
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3">{update.description}</p>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {update.description}
+                      </p>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>📅 {update.date}</span>
                         <span>•</span>
@@ -337,8 +388,12 @@ export function AdminPanel() {
         {activeTab === "support" && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl text-[var(--navy)] mb-2">User Support & Disputes</h2>
-              <p className="text-gray-600">Manage users whose items are stuck in customs</p>
+              <h2 className="text-2xl text-[var(--navy)] mb-2">
+                User Support & Disputes
+              </h2>
+              <p className="text-gray-600">
+                Manage users whose items are stuck in customs
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -370,31 +425,35 @@ export function AdminPanel() {
                     ticket.status === "urgent"
                       ? "border-red-200"
                       : ticket.status === "pending"
-                      ? "border-yellow-200"
-                      : "border-green-200"
+                        ? "border-yellow-200"
+                        : "border-green-200"
                   }`}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg text-[var(--navy)]">{ticket.user}</h3>
+                        <h3 className="text-lg text-[var(--navy)]">
+                          {ticket.user}
+                        </h3>
                         <span
                           className={`px-3 py-1 rounded-full text-xs ${
                             ticket.status === "urgent"
                               ? "bg-red-100 text-red-700"
                               : ticket.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-green-100 text-green-700"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-green-100 text-green-700"
                           }`}
                         >
                           {ticket.status.toUpperCase()}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600 mb-1">
-                        <span className="font-medium">Product:</span> {ticket.product}
+                        <span className="font-medium">Product:</span>{" "}
+                        {ticket.product}
                       </div>
                       <div className="text-sm text-gray-600 mb-3">
-                        <span className="font-medium">Issue:</span> {ticket.issue}
+                        <span className="font-medium">Issue:</span>{" "}
+                        {ticket.issue}
                       </div>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <span>Created: {ticket.created}</span>

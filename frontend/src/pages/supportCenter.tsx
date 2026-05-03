@@ -75,14 +75,14 @@ export function SupportTicket() {
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <h1 className="text-3xl text-[var(--navy)] mb-4">
-            Ticket Submitted!
+            Talep Gönderildi!
           </h1>
           <p className="text-gray-600 mb-2">
-            Your support ticket has been created successfully. Our team will
-            review your case and respond within 2-4 hours.
+            Destek talebin başarıyla oluşturuldu. Ekibimiz talebini inceleyip
+            2-4 saat içinde yanıt verecek.
           </p>
           <p className="text-sm text-gray-500 mb-8">
-            You'll receive email updates at{" "}
+            E-posta güncellemelerini şu adresten alacaksın{" "}
             <span className="text-[var(--navy)]">{formData.email}</span>
           </p>
           <div className="inline-flex gap-2 mb-4">
@@ -90,7 +90,9 @@ export function SupportTicket() {
             <div className="w-2 h-2 bg-[var(--electric-blue)] rounded-full animate-pulse delay-100" />
             <div className="w-2 h-2 bg-[var(--electric-blue)] rounded-full animate-pulse delay-200" />
           </div>
-          <p className="text-sm text-gray-500">Redirecting to Help Center...</p>
+          <p className="text-sm text-gray-500">
+            Yardım Merkezine yönlendiriliyor...
+          </p>
         </div>
       </div>
     );
@@ -105,14 +107,14 @@ export function SupportTicket() {
             className="flex items-center gap-2 text-[var(--electric-blue)] hover:underline mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Help Center
+            Yardım Merkezine Dön
           </Link>
           <h1 className="text-3xl text-[var(--navy)] mb-2">
-            Submit Support Ticket
+            Destek Talebi Gönder
           </h1>
           <p className="text-gray-600">
-            Having trouble with your order? Our expert team is here to help
-            resolve your issue.
+            Siparişinle ilgili sorun mu yaşıyorsun? Uzman ekibimiz sorunu
+            çözmene yardımcı olmak için burada.
           </p>
         </div>
       </div>
@@ -123,13 +125,13 @@ export function SupportTicket() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="bg-white rounded-xl p-6 border border-gray-200">
                 <h2 className="text-xl text-[var(--navy)] mb-6">
-                  Contact Information
+                  İletişim Bilgileri
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block mb-2 text-sm text-gray-700">
-                      Full Name
+                      Ad Soyad
                     </label>
                     <input
                       type="text"
@@ -143,7 +145,7 @@ export function SupportTicket() {
 
                   <div>
                     <label className="block mb-2 text-sm text-gray-700">
-                      Email Address
+                      E-posta Adresi
                     </label>
                     <input
                       type="email"
@@ -157,8 +159,7 @@ export function SupportTicket() {
 
                   <div className="md:col-span-2">
                     <label className="block mb-2 text-sm text-gray-700">
-                      Order ID{" "}
-                      <span className="text-gray-500">(if applicable)</span>
+                      Sipariş No <span className="text-gray-500">(varsa)</span>
                     </label>
                     <input
                       type="text"
@@ -173,13 +174,13 @@ export function SupportTicket() {
 
               <div className="bg-white rounded-xl p-6 border border-gray-200">
                 <h2 className="text-xl text-[var(--navy)] mb-6">
-                  Issue Details
+                  Sorun Detayları
                 </h2>
 
                 <div className="space-y-6">
                   <div>
                     <label className="block mb-3 text-sm text-gray-700">
-                      Issue Type
+                      Sorun Türü
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {issueTypes.map((type) => (
@@ -212,21 +213,21 @@ export function SupportTicket() {
 
                   <div>
                     <label className="block mb-2 text-sm text-gray-700">
-                      Subject
+                      Konu
                     </label>
                     <input
                       type="text"
                       value={formData.subject}
                       onChange={(e) => updateField("subject", e.target.value)}
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
-                      placeholder="Brief summary of your issue"
+                      placeholder="Sorunun kısa özeti"
                       required
                     />
                   </div>
 
                   <div>
                     <label className="block mb-2 text-sm text-gray-700">
-                      Description
+                      Açıklama
                     </label>
                     <textarea
                       value={formData.description}
@@ -235,7 +236,7 @@ export function SupportTicket() {
                       }
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)] resize-none"
                       rows={6}
-                      placeholder="Please provide as much detail as possible about your issue. Include tracking numbers, error messages, or any relevant information."
+                      placeholder="Lütfen sorun hakkında mümkün olduğunca detay ver. Takip numaralarını, hata mesajlarını veya ilgili diğer bilgileri ekle."
                       required
                     />
                   </div>
@@ -243,10 +244,11 @@ export function SupportTicket() {
               </div>
 
               <div className="bg-white rounded-xl p-6 border border-gray-200">
-                <h2 className="text-xl text-[var(--navy)] mb-3">Attachments</h2>
+                <h2 className="text-xl text-[var(--navy)] mb-3">Ekler</h2>
                 <p className="text-sm text-gray-600 mb-6">
-                  Upload screenshots of stuck customs status, error messages, or
-                  damaged product photos (Max 5 files, 10MB each)
+                  Takılan gümrük durumu ekran görüntülerini, hata mesajlarını
+                  veya hasarlı ürün fotoğraflarını yükle (En fazla 5 dosya, her
+                  biri 10MB)
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -256,7 +258,7 @@ export function SupportTicket() {
                       className="aspect-square border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center hover:border-[var(--electric-blue)] transition-colors cursor-pointer bg-gray-50"
                     >
                       <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-xs text-gray-500">Upload File</span>
+                      <span className="text-xs text-gray-500">Dosya Yükle</span>
                     </div>
                   ))}
                 </div>
@@ -265,9 +267,9 @@ export function SupportTicket() {
                   <p className="flex items-start gap-2">
                     <Image className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span>
-                      For customs issues, include screenshots showing your
-                      tracking status and any notifications from customs
-                      authorities.
+                      Gümrük sorunları için takip durumunu ve gümrük
+                      yetkililerinden gelen bildirimleri gösteren ekran
+                      görüntülerini ekle.
                     </span>
                   </p>
                 </div>
@@ -277,7 +279,7 @@ export function SupportTicket() {
                 type="submit"
                 className="w-full bg-[var(--electric-blue)] text-white py-4 rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors text-lg"
               >
-                Submit Support Ticket
+                Destek Talebi Gönder
               </button>
             </form>
           </div>
@@ -285,7 +287,7 @@ export function SupportTicket() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="text-lg text-[var(--navy)] mb-4">
-                What to Expect
+                Seni Neler Bekliyor
               </h3>
               <div className="space-y-4">
                 <div className="flex gap-3">
@@ -294,10 +296,10 @@ export function SupportTicket() {
                   </div>
                   <div>
                     <div className="text-sm text-[var(--navy)] mb-1">
-                      Instant Confirmation
+                      Anında Onay
                     </div>
                     <div className="text-xs text-gray-600">
-                      You'll receive an email with your ticket number
+                      Talep numaranla birlikte e-posta alacaksın
                     </div>
                   </div>
                 </div>
@@ -308,10 +310,10 @@ export function SupportTicket() {
                   </div>
                   <div>
                     <div className="text-sm text-[var(--navy)] mb-1">
-                      Team Review
+                      Ekip İncelemesi
                     </div>
                     <div className="text-xs text-gray-600">
-                      Our experts review your case within 2-4 hours
+                      Uzmanlarımız talebini 2-4 saat içinde inceler
                     </div>
                   </div>
                 </div>
@@ -321,11 +323,9 @@ export function SupportTicket() {
                     3
                   </div>
                   <div>
-                    <div className="text-sm text-[var(--navy)] mb-1">
-                      Resolution
-                    </div>
+                    <div className="text-sm text-[var(--navy)] mb-1">Çözüm</div>
                     <div className="text-xs text-gray-600">
-                      We'll provide a solution or next steps
+                      Sana çözüm veya sonraki adımları sunacağız
                     </div>
                   </div>
                 </div>
@@ -334,25 +334,27 @@ export function SupportTicket() {
 
             <div className="bg-gradient-to-br from-[var(--navy)] to-[var(--electric-blue)] rounded-xl p-6 text-white">
               <AlertCircle className="w-8 h-8 mb-4" />
-              <h3 className="text-lg mb-2">Priority Support</h3>
+              <h3 className="text-lg mb-2">Öncelikli Destek</h3>
               <p className="text-sm text-gray-300 mb-4">
-                Customs-related issues are prioritized and typically resolved
-                within 24 hours.
+                Gümrükle ilgili sorunlar önceliklidir ve genellikle 24 saat
+                içinde çözülür.
               </p>
               <div className="space-y-2 text-sm">
-                <div>📧 Email: support@gatify.com</div>
-                <div>⏰ Hours: 24/7 Support</div>
-                <div>📞 Avg Response: 2.4 hours</div>
+                <div>📧 E-posta: support@gatify.com</div>
+                <div>⏰ Saatler: 7/24 Destek</div>
+                <div>📞 Ortalama Yanıt: 2.4 saat</div>
               </div>
             </div>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-              <h3 className="text-lg text-[var(--navy)] mb-3">Quick Tips</h3>
+              <h3 className="text-lg text-[var(--navy)] mb-3">
+                Hızlı İpuçları
+              </h3>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li>✓ Include your order ID for faster processing</li>
-                <li>✓ Attach clear photos/screenshots</li>
-                <li>✓ Mention specific error messages</li>
-                <li>✓ Note when the issue started</li>
+                <li>✓ Daha hızlı işlem için sipariş numaranı ekle</li>
+                <li>✓ Net fotoğraf/ekran görüntüleri ekle</li>
+                <li>✓ Hata mesajlarını açıkça yaz</li>
+                <li>✓ Sorunun ne zaman başladığını belirt</li>
               </ul>
             </div>
           </div>

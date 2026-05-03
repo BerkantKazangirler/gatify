@@ -2,9 +2,11 @@ import { Outlet, useLocation, Link } from "react-router";
 import { Package, LayoutDashboard, Search, MapPin, Settings, Store, FileText, HelpCircle, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import classNames from "classnames";
+import { useAuth } from "../context/AuthContext";
 
 export function RootLayout() {
   const location = useLocation();
+  const { user } = useAuth();
   const [isLoggedIn] = useState(true);
   const [userRole] = useState<"buyer" | "seller" | "admin">("buyer");
   const [showHeader, setShowHeader] = useState(true);
@@ -15,16 +17,16 @@ export function RootLayout() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Check if user scrolled down or up
+      // Kullanıcı aşağı mı yukarı mı kaydırdı kontrol et
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down - hide header
+        // Aşağı kaydırıyorsa başlığı gizle
         setShowHeader(false);
       } else {
-        // Scrolling up - show header
+        // Yukarı kaydırıyorsa başlığı göster
         setShowHeader(true);
       }
 
-      // Check if not at top
+      // En üstte olup olmadığını kontrol et
       setIsScrolled(currentScrollY > 0);
       setLastScrollY(currentScrollY);
     };
@@ -82,36 +84,48 @@ export function RootLayout() {
                 to="/products"
                 className="text-gray-600 hover:text-[var(--navy)] transition-colors"
               >
-                Products
+                Ürünler
               </Link>
               <Link
                 to="/help"
                 className="text-gray-600 hover:text-[var(--navy)] transition-colors"
               >
-                Help Center
+                Yardım Merkezi
               </Link>
               <Link
                 to="/support"
                 className="text-gray-600 hover:text-[var(--navy)] transition-colors"
               >
-                Support
+                Destek
               </Link>
             </nav>
 
-            <div className="flex items-center gap-3">
+            {user ? (
               <Link
-                to="/login"
-                className="px-4 py-2 text-[var(--navy)] hover:bg-gray-100 rounded-xl transition-colors"
+                to="/profile"
+                className="flex items-center gap-3 hover:bg-gray-100 rounded-xl p-2 transition-colors"
               >
-                Sign In
+                <div className="w-10 h-10 rounded-full bg-[var(--electric-blue)] flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm text-gray-700">{user.name}</span>
               </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 bg-[var(--electric-blue)] text-white rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors"
-              >
-                Get Started
-              </Link>
-            </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/login"
+                  className="px-4 py-2 text-[var(--navy)] hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  Giriş Yap
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 bg-[var(--electric-blue)] text-white rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors"
+                >
+                  Başla
+                </Link>
+              </div>
+            )}
           </div>
         </header>
 
@@ -133,8 +147,8 @@ export function RootLayout() {
                   <span className="text-xl font-space-grotesk">Gatify</span>
                 </div>
                 <p className="text-gray-400 text-sm">
-                  Global commerce made simple with automated customs and price
-                  arbitrage.
+                  Otomatik gümrük ve fiyat avantajı ile küresel ticareti
+                  basitleştirir.
                 </p>
               </div>
 
@@ -145,74 +159,74 @@ export function RootLayout() {
                     to="/products"
                     className="block hover:text-white transition-colors"
                   >
-                    Browse Products
+                    Ürünleri İncele
                   </Link>
                   <Link
                     to="/help"
                     className="block hover:text-white transition-colors"
                   >
-                    How It Works
+                    Nasıl Çalışır
                   </Link>
                   <Link
                     to="/register"
                     className="block hover:text-white transition-colors"
                   >
-                    Become a Seller
+                    Satıcı Ol
                   </Link>
                 </div>
               </div>
 
               <div>
-                <h3 className="mb-4 font-space-grotesk">Support</h3>
+                <h3 className="mb-4 font-space-grotesk">Destek</h3>
                 <div className="space-y-2 text-sm text-gray-400">
                   <Link
                     to="/help"
                     className="block hover:text-white transition-colors"
                   >
-                    FAQ
+                    SSS
                   </Link>
                   <Link
                     to="/support"
                     className="block hover:text-white transition-colors"
                   >
-                    Contact Us
+                    Bize Ulaşın
                   </Link>
                   <a
                     href="#"
                     className="block hover:text-white transition-colors"
                   >
-                    Customs Guide
+                    Gümrük Rehberi
                   </a>
                 </div>
               </div>
 
               <div>
-                <h3 className="mb-4 font-space-grotesk">Legal</h3>
+                <h3 className="mb-4 font-space-grotesk">Yasal</h3>
                 <div className="space-y-2 text-sm text-gray-400">
                   <a
                     href="#"
                     className="block hover:text-white transition-colors"
                   >
-                    Terms of Service
+                    Hizmet Şartları
                   </a>
                   <a
                     href="#"
                     className="block hover:text-white transition-colors"
                   >
-                    Privacy Policy
+                    Gizlilik Politikası
                   </a>
                   <a
                     href="#"
                     className="block hover:text-white transition-colors"
                   >
-                    Cookie Policy
+                    Çerez Politikası
                   </a>
                 </div>
               </div>
             </div>
 
             <div className="border-t border-[var(--navy-light)] mt-8 pt-8 text-center text-sm text-gray-400">
-              © 2026 Gatify. All rights reserved.
+              © 2026 Gatify. Tüm hakları saklıdır.
             </div>
           </div>
         </footer>
@@ -236,10 +250,10 @@ export function RootLayout() {
             </Link>
             <p className="text-sm text-gray-400 mt-1">
               {isSellerPage
-                ? "Seller Portal"
+                ? "Satıcı Paneli"
                 : isAdminPage
-                  ? "Admin Panel"
-                  : "Global Trade Platform"}
+                  ? "Yönetici Paneli"
+                  : "Küresel Ticaret Platformu"}
             </p>
           </div>
 
@@ -249,13 +263,13 @@ export function RootLayout() {
                 <NavLink
                   to="/admin"
                   icon={<Settings className="w-5 h-5" />}
-                  label="Admin Panel"
+                  label="Yönetici Paneli"
                   active={location.pathname === "/admin"}
                 />
                 <NavLink
                   to="/dashboard"
                   icon={<LayoutDashboard className="w-5 h-5" />}
-                  label="Back to Dashboard"
+                  label="Panele Dön"
                   active={false}
                 />
               </>
@@ -264,26 +278,26 @@ export function RootLayout() {
                 <NavLink
                   to="/seller"
                   icon={<Store className="w-5 h-5" />}
-                  label="Seller Dashboard"
+                  label="Satıcı Paneli"
                   active={location.pathname === "/seller"}
                 />
                 <NavLink
                   to="/seller/products/new"
                   icon={<Package className="w-5 h-5" />}
-                  label="Add Product"
+                  label="Ürün Ekle"
                   active={location.pathname.includes("/products/")}
                 />
                 <NavLink
                   to="/seller/export-docs"
                   icon={<FileText className="w-5 h-5" />}
-                  label="Export Docs"
+                  label="Dışa Aktarım Belgeleri"
                   active={location.pathname === "/seller/export-docs"}
                 />
                 <div className="my-4 border-t border-[var(--navy-light)]" />
                 <NavLink
                   to="/dashboard"
                   icon={<LayoutDashboard className="w-5 h-5" />}
-                  label="Buyer Dashboard"
+                  label="Alıcı Paneli"
                   active={false}
                 />
               </>
@@ -292,19 +306,19 @@ export function RootLayout() {
                 <NavLink
                   to="/dashboard"
                   icon={<LayoutDashboard className="w-5 h-5" />}
-                  label="Dashboard"
+                  label="Panel"
                   active={location.pathname === "/dashboard"}
                 />
                 <NavLink
                   to="/products"
                   icon={<Search className="w-5 h-5" />}
-                  label="Discover Products"
+                  label="Ürünleri Keşfet"
                   active={location.pathname.startsWith("/products")}
                 />
                 <NavLink
                   to="/tracking"
                   icon={<MapPin className="w-5 h-5" />}
-                  label="Track Shipments"
+                  label="Gönderileri Takip Et"
                   active={location.pathname === "/tracking"}
                 />
                 {userRole === "seller" && (
@@ -313,7 +327,7 @@ export function RootLayout() {
                     <NavLink
                       to="/seller"
                       icon={<Store className="w-5 h-5" />}
-                      label="Seller Portal"
+                      label="Satıcı Paneli"
                       active={false}
                     />
                   </>

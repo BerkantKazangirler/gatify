@@ -1,29 +1,76 @@
 import { Search, TrendingDown, Package, MapPin, Clock, DollarSign, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
-
-const arbitrageDeals = [
-  { id: 1, product: "Sony WH-1000XM5 Headphones", globalPrice: 299, localPrice: 449, savings: 150, savingsPercent: 33, country: "USA", risk: "Low" },
-  { id: 2, product: "Dyson V15 Detect Vacuum", globalPrice: 549, localPrice: 799, savings: 250, savingsPercent: 31, country: "UK", risk: "Low" },
-  { id: 3, product: "Apple AirPods Pro 2", globalPrice: 189, localPrice: 279, savings: 90, savingsPercent: 32, country: "Japan", risk: "Medium" },
-  { id: 4, product: "Lego Millennium Falcon", globalPrice: 849, localPrice: 1199, savings: 350, savingsPercent: 29, country: "Germany", risk: "Low" },
-];
+import { fetchAllProducts } from "../utils/firestoreHelpers";
+import { useAuth } from "../context/AuthContext";
 
 const activeShipments = [
-  { id: 1, product: "MacBook Pro 16\"", status: "In Transit", location: "Singapore Port", eta: "2 days", progress: 60 },
-  { id: 2, product: "Nintendo Switch OLED", status: "Customs Clearance", location: "Local Customs", eta: "1 day", progress: 85 },
-  { id: 3, product: "Bose QuietComfort 45", status: "Preparing Shipment", location: "USA Warehouse", eta: "5 days", progress: 20 },
+  {
+    id: 1,
+    product: 'MacBook Pro 16"',
+    status: "In Transit",
+    location: "Singapore Port",
+    eta: "2 days",
+    progress: 60,
+  },
+  {
+    id: 2,
+    product: "Nintendo Switch OLED",
+    status: "Customs Clearance",
+    location: "Local Customs",
+    eta: "1 day",
+    progress: 85,
+  },
+  {
+    id: 3,
+    product: "Bose QuietComfort 45",
+    status: "Preparing Shipment",
+    location: "USA Warehouse",
+    eta: "5 days",
+    progress: 20,
+  },
 ];
 
 export function Dashboard() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [arbitrageDeals, setArbitrageDeals] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchAllProducts()
+      .then((products) => {
+        if (products && products.length > 0) {
+          const dynamicDeals = products.map((p) => {
+            const lp = p.localPrice || p.globalPrice * 1.3;
+            const savings =
+              lp > 0 ? Math.round(((lp - p.globalPrice) / lp) * 100) : 0;
+            return {
+              id: p.id,
+              product: p.name,
+              globalPrice: p.globalPrice,
+              localPrice: lp,
+              savings: lp - p.globalPrice,
+              savingsPercent: savings,
+              country: p.country || "Global",
+              risk: p.risk || "Low",
+            };
+          });
+          setArbitrageDeals(dynamicDeals.slice(0, 4));
+        }
+      })
+      .catch((err) => console.error("API error:", err));
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-r from-[var(--navy)] to-[var(--navy-light)] text-white p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl mb-2">Welcome back!</h1>
-          <p className="text-gray-300 mb-6">Discover global deals and track your shipments</p>
+          <h1 className="text-3xl mb-2">
+            Tekrar hoş geldin{user?.name ? `, ${user.name}` : ""}!
+          </h1>
+          <p className="text-gray-300 mb-6">
+            Küresel fırsatları keşfet ve gönderilerini takip et
+          </p>
 
           <div className="relative max-w-3xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
@@ -32,22 +79,22 @@ export function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-14 pr-6 py-4 rounded-xl bg-white text-gray-900 text-lg focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)] shadow-lg"
-              placeholder="Search for products worldwide (e.g., iPhone 15, Nike Air Max)"
+              placeholder="Dünyadaki ürünleri ara (ör. iPhone 15, Nike Air Max)"
             />
           </div>
 
           <div className="flex gap-4 mt-4">
             <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Electronics
+              Elektronik
             </button>
             <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Fashion
+              Moda
             </button>
             <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Home & Garden
+              Ev & Bahçe
             </button>
             <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-sm">
-              Sports
+              Spor
             </button>
           </div>
         </div>
@@ -57,9 +104,9 @@ export function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             icon={<TrendingDown className="w-6 h-6" />}
-            label="Avg. Savings"
+            label="Ortalama Tasarruf"
             value="32%"
-            description="vs local prices"
+            description="yerel fiyatlara göre"
             color="green"
           />
           <StatCard
@@ -80,8 +127,13 @@ export function Dashboard() {
 
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl text-[var(--navy)]">🔥 Top Price Arbitrage Opportunities</h2>
-            <Link to="/products" className="text-[var(--electric-blue)] hover:underline flex items-center gap-1">
+            <h2 className="text-2xl text-[var(--navy)]">
+              🔥 Top Price Arbitrage Opportunities
+            </h2>
+            <Link
+              to="/products"
+              className="text-[var(--electric-blue)] hover:underline flex items-center gap-1"
+            >
               View All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -113,12 +165,18 @@ export function Dashboard() {
 
                 <div className="flex items-end justify-between">
                   <div>
-                    <div className="text-sm text-gray-500 mb-1">Global Price</div>
-                    <div className="text-2xl text-[var(--electric-blue)]">${deal.globalPrice}</div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      Global Price
+                    </div>
+                    <div className="text-2xl text-[var(--electric-blue)]">
+                      ${deal.globalPrice}
+                    </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-sm text-gray-500 line-through">${deal.localPrice}</div>
+                    <div className="text-sm text-gray-500 line-through">
+                      ${deal.localPrice}
+                    </div>
                     <div className="text-lg text-green-600">
                       Save ${deal.savings} ({deal.savingsPercent}%)
                     </div>
@@ -132,7 +190,10 @@ export function Dashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl text-[var(--navy)]">Active Shipments</h2>
-            <Link to="/tracking" className="text-[var(--electric-blue)] hover:underline flex items-center gap-1">
+            <Link
+              to="/tracking"
+              className="text-[var(--electric-blue)] hover:underline flex items-center gap-1"
+            >
               Track All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -145,7 +206,9 @@ export function Dashboard() {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg text-[var(--navy)] mb-1">{shipment.product}</h3>
+                    <h3 className="text-lg text-[var(--navy)] mb-1">
+                      {shipment.product}
+                    </h3>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
@@ -175,7 +238,9 @@ export function Dashboard() {
                       style={{ width: `${shipment.progress}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-500 mt-1 text-right">{shipment.progress}% Complete</div>
+                  <div className="text-xs text-gray-500 mt-1 text-right">
+                    {shipment.progress}% Complete
+                  </div>
                 </div>
               </div>
             ))}

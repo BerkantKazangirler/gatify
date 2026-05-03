@@ -173,7 +173,7 @@ export function Tracking() {
     setGeneratingPdf(true);
     setTimeout(() => {
       setGeneratingPdf(false);
-      alert("Customs petition PDF generated and downloaded!");
+      alert("Gümrük dilekçesi PDF'i oluşturuldu ve indirildi!");
     }, 2000);
   };
 
@@ -181,9 +181,12 @@ export function Tracking() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200 p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl text-[var(--navy)] mb-2">Track Shipments</h1>
+          <h1 className="text-3xl text-[var(--navy)] mb-2">
+            Gönderileri Takip Et
+          </h1>
           <p className="text-gray-600">
-            Monitor your orders in real-time with predictive customs analytics
+            Tahmine dayalı gümrük analizleriyle siparişlerini gerçek zamanlı
+            izle
           </p>
         </div>
       </div>
@@ -214,7 +217,7 @@ export function Tracking() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>ETA: {shipment.eta}</span>
+                  <span>Tahmini varış: {shipment.eta}</span>
                 </div>
               </div>
 
@@ -235,7 +238,7 @@ export function Tracking() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <h2 className="text-xl text-[var(--navy)] mb-6">
-              Shipment Journey Map
+              Gönderi Yol Haritası
             </h2>
 
             <div className="aspect-video bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl mb-6 relative overflow-hidden">
@@ -257,7 +260,7 @@ export function Tracking() {
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <Package className="w-6 h-6 text-green-600" />
                 </div>
-                <div className="text-gray-600">Origin</div>
+                <div className="text-gray-600">Çıkış Noktası</div>
                 <div className="text-[var(--navy)]">
                   {selectedShipment.origin}
                 </div>
@@ -279,7 +282,7 @@ export function Tracking() {
                     }`}
                   />
                 </div>
-                <div className="text-gray-600">Current</div>
+                <div className="text-gray-600">Mevcut Konum</div>
                 <div className="text-[var(--navy)]">
                   {selectedShipment.currentLocation}
                 </div>
@@ -289,7 +292,7 @@ export function Tracking() {
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
                   <Home className="w-6 h-6 text-purple-600" />
                 </div>
-                <div className="text-gray-600">Destination</div>
+                <div className="text-gray-600">Varış Noktası</div>
                 <div className="text-[var(--navy)]">
                   {selectedShipment.destination}
                 </div>
@@ -299,7 +302,7 @@ export function Tracking() {
 
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <h2 className="text-xl text-[var(--navy)] mb-6">
-              Timeline & Status
+              Zaman Çizelgesi ve Durum
             </h2>
 
             {selectedShipment.status === "customs_alert" && (
@@ -307,7 +310,9 @@ export function Tracking() {
                 <div className="flex items-start gap-3 mb-4">
                   <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="text-red-900 mb-1">🚨 Customs Red Alert</h3>
+                    <h3 className="text-red-900 mb-1">
+                      🚨 Gümrük Kırmızı Alarm
+                    </h3>
                     <p className="text-sm text-red-800">
                       {selectedShipment.alert}
                     </p>

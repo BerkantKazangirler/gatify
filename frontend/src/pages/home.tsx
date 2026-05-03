@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
+import { fetchAllProducts } from "../utils/firestoreHelpers";
 import {
   Search,
   TrendingDown,
@@ -11,74 +12,7 @@ import {
   Star,
 } from "lucide-react";
 
-const featuredDeals = [
-  {
-    id: 1,
-    name: "Sony WH-1000XM5",
-    category: "Electronics",
-    globalPrice: 299,
-    localPrice: 449,
-    savings: 33,
-    country: "USA",
-    rating: 4.8,
-    image: "🎧",
-  },
-  {
-    id: 2,
-    name: "Dyson V15 Detect",
-    category: "Home",
-    globalPrice: 549,
-    localPrice: 799,
-    savings: 31,
-    country: "UK",
-    rating: 4.9,
-    image: "🧹",
-  },
-  {
-    id: 3,
-    name: "Apple AirPods Pro 2",
-    category: "Electronics",
-    globalPrice: 189,
-    localPrice: 279,
-    savings: 32,
-    country: "Japan",
-    rating: 4.7,
-    image: "🎵",
-  },
-  {
-    id: 4,
-    name: "Lego Millennium Falcon",
-    category: "Toys",
-    globalPrice: 849,
-    localPrice: 1199,
-    savings: 29,
-    country: "Germany",
-    rating: 5.0,
-    image: "🚀",
-  },
-  {
-    id: 5,
-    name: "Nike Air Max 2024",
-    category: "Fashion",
-    globalPrice: 159,
-    localPrice: 229,
-    savings: 31,
-    country: "Vietnam",
-    rating: 4.6,
-    image: "👟",
-  },
-  {
-    id: 6,
-    name: "Samsung Galaxy S24",
-    category: "Electronics",
-    globalPrice: 1099,
-    localPrice: 1499,
-    savings: 27,
-    country: "South Korea",
-    rating: 4.8,
-    image: "📱",
-  },
-];
+const featuredDeals: any[] = [];
 
 const features: Array<{
   icon: React.ReactNode;
@@ -114,6 +48,34 @@ const features: Array<{
 
 export function Home() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [deals, setDeals] = useState<any[]>(featuredDeals);
+
+  useEffect(() => {
+    fetchAllProducts()
+      .then((products) => {
+        // Map backend products to match frontend featured deal card requirements
+        if (products && products.length > 0) {
+          const dynamicDeals = products.map((p) => {
+            const lp = p.localPrice || p.globalPrice * 1.3; // fallback local price
+            const savings =
+              lp > 0 ? Math.round(((lp - p.globalPrice) / lp) * 100) : 0;
+            return {
+              id: p.id,
+              name: p.name,
+              category: p.category,
+              globalPrice: p.globalPrice,
+              localPrice: lp,
+              savings: savings,
+              country: p.country || "Global",
+              rating: 5.0,
+              image: p.image || "📦",
+            };
+          });
+          setDeals(dynamicDeals.slice(0, 6)); // Show top 6 deals
+        }
+      })
+      .catch((err) => console.error("Could not fetch real products:", err));
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -122,18 +84,18 @@ export function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-6">
               <Package className="w-4 h-4" />
-              <span className="text-sm">Cross-Border Commerce Platform</span>
+              <span className="text-sm">Sınır ötesi ticaret platformu</span>
             </div>
             <h1 className="text-5xl md:text-6xl mb-6">
-              Shop Globally,
+              Küresel alışveriş yap,
               <br />
               <span className="text-[var(--electric-blue-light)]">
-                Save Massively
+                büyük tasarruf et
               </span>
             </h1>
             <p className="text-xl text-gray-300 mb-8">
-              Compare prices worldwide, navigate customs automatically, and save
-              up to 40% on premium products.
+              Dünya genelinde fiyat karşılaştır, gümrük işlemlerini
+              otomatikleştir ve premium ürünlerde %40'a kadar tasarruf et.
             </p>
 
             <div className="relative max-w-2xl">
@@ -143,26 +105,26 @@ export function Home() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-16 pr-6 py-5 rounded-xl bg-white text-gray-900 text-lg focus:outline-none focus:ring-4 focus:ring-[var(--electric-blue)] shadow-2xl"
-                placeholder="Search for products worldwide..."
+                placeholder="Dünyadaki ürünleri ara..."
               />
               <Link
                 to="/products"
                 className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-3 bg-[var(--electric-blue)] text-white rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors"
               >
-                Explore
+                Keşfet
               </Link>
             </div>
 
             <div className="flex flex-wrap gap-3 mt-6">
-              <span className="text-sm text-gray-300">Popular:</span>
+              <span className="text-sm text-gray-300">Popüler:</span>
               <button className="px-4 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm transition-colors">
-                Electronics
+                Elektronik
               </button>
               <button className="px-4 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm transition-colors">
-                Fashion
+                Moda
               </button>
               <button className="px-4 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm transition-colors">
-                Home & Garden
+                Ev & Bahçe
               </button>
             </div>
           </div>
@@ -180,23 +142,23 @@ export function Home() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl text-[var(--navy)] mb-2">
-                🔥 Trending Global Deals
+                🔥 Trend Olan Küresel Fırsatlar
               </h2>
               <p className="text-gray-600">
-                Top price arbitrage opportunities this week
+                Bu haftanın en iyi fiyat avantajı fırsatları
               </p>
             </div>
             <Link
               to="/products"
               className="flex items-center gap-2 px-6 py-3 bg-[var(--electric-blue)] text-white rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors"
             >
-              <span>View All</span>
+              <span>Tümünü Gör</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredDeals.map((product) => (
+            {deals.map((product) => (
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
@@ -234,7 +196,7 @@ export function Home() {
 
                   <div className="flex items-center justify-between pt-3 border-t border-gray-200">
                     <span className="text-sm text-gray-600">
-                      From {product.country}
+                      {product.country} çıkışlı
                     </span>
                     <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                       -{product.savings}%
@@ -247,23 +209,23 @@ export function Home() {
         </div>
 
         <div className="bg-gradient-to-r from-[var(--navy)] to-[var(--electric-blue)] rounded-2xl p-12 text-white text-center">
-          <h2 className="text-3xl mb-4">Ready to Start Saving?</h2>
+          <h2 className="text-3xl mb-4">Tasarrufa başlamaya hazır mısın?</h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of smart shoppers who save money on every purchase
-            with global price comparison and automated customs.
+            Küresel fiyat karşılaştırma ve otomatik gümrük ile her alışverişte
+            tasarruf eden binlerce akıllı alışverişçiye katıl.
           </p>
           <div className="flex gap-4 justify-center">
             <Link
               to="/register"
               className="px-8 py-4 bg-white text-[var(--navy)] rounded-xl hover:bg-gray-100 transition-colors text-lg"
             >
-              Create Free Account
+              Ücretsiz Hesap Oluştur
             </Link>
             <Link
               to="/help"
               className="px-8 py-4 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-lg border border-white/30"
             >
-              Learn More
+              Daha Fazla Bilgi
             </Link>
           </div>
         </div>

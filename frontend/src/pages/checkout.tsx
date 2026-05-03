@@ -51,34 +51,34 @@ export function Checkout() {
             className="flex items-center gap-2 text-[var(--electric-blue)] hover:underline mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Product
+            Ürüne Dön
           </Link>
 
           <div className="flex items-center gap-4">
             <StepIndicator
               number={1}
-              label="Review"
+              label="İnceleme"
               active={step === "review"}
               completed={step !== "review"}
             />
             <div className="h-0.5 w-12 bg-gray-300" />
             <StepIndicator
               number={2}
-              label="Payment"
+              label="Ödeme"
               active={step === "payment"}
               completed={step === "customs" || step === "complete"}
             />
             <div className="h-0.5 w-12 bg-gray-300" />
             <StepIndicator
               number={3}
-              label="Customs"
+              label="Gümrük"
               active={step === "customs"}
               completed={step === "complete"}
             />
             <div className="h-0.5 w-12 bg-gray-300" />
             <StepIndicator
               number={4}
-              label="Complete"
+              label="Tamamlandı"
               active={step === "complete"}
               completed={false}
             />
@@ -91,7 +91,7 @@ export function Checkout() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h2 className="text-2xl text-[var(--navy)] mb-6">
-                Order Summary
+                Sipariş Özeti
               </h2>
 
               <div className="flex gap-6 mb-6">
@@ -104,23 +104,23 @@ export function Checkout() {
                   </h3>
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex justify-between">
-                      <span>Base Price</span>
+                      <span>Baz Fiyat</span>
                       <span>${product.price}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Shipping (Air)</span>
+                      <span>Kargo (Hava)</span>
                       <span>${product.shipping}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Customs Tax</span>
+                      <span>Gümrük Vergisi</span>
                       <span>${product.customs}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>VAT</span>
+                      <span>KDV</span>
                       <span>${product.vat}</span>
                     </div>
                     <div className="flex justify-between pt-3 border-t border-gray-200 text-lg text-[var(--navy)]">
-                      <span>Total</span>
+                      <span>Toplam</span>
                       <span className="font-medium">${product.total}</span>
                     </div>
                   </div>
@@ -130,32 +130,32 @@ export function Checkout() {
 
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="text-lg text-[var(--navy)] mb-4">
-                Shipping Address
+                Teslimat Adresi
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"
-                  placeholder="Full Name"
+                  placeholder="Ad Soyad"
                   className="px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                 />
                 <input
                   type="text"
-                  placeholder="Phone Number"
+                  placeholder="Telefon Numarası"
                   className="px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                 />
                 <input
                   type="text"
-                  placeholder="Street Address"
+                  placeholder="Sokak Adresi"
                   className="col-span-2 px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                 />
                 <input
                   type="text"
-                  placeholder="City"
+                  placeholder="Şehir"
                   className="px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                 />
                 <input
                   type="text"
-                  placeholder="Postal Code"
+                  placeholder="Posta Kodu"
                   className="px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none focus:ring-2 focus:ring-[var(--electric-blue)]"
                 />
               </div>
@@ -165,7 +165,7 @@ export function Checkout() {
               onClick={handleProceed}
               className="w-full bg-[var(--electric-blue)] text-white py-4 rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors text-lg"
             >
-              Proceed to Payment
+              Ödemeye Geç
             </button>
           </div>
         )}
@@ -174,13 +174,13 @@ export function Checkout() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h2 className="text-2xl text-[var(--navy)] mb-6">
-                Payment Information
+                Ödeme Bilgileri
               </h2>
 
               <div className="space-y-4">
                 <div>
                   <label className="block mb-2 text-sm text-gray-700">
-                    Card Number
+                    Kart Numarası
                   </label>
                   <div className="relative">
                     <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -195,7 +195,7 @@ export function Checkout() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block mb-2 text-sm text-gray-700">
-                      Expiry Date
+                      Son Kullanma Tarihi
                     </label>
                     <input
                       type="text"
@@ -217,7 +217,7 @@ export function Checkout() {
 
                 <div>
                   <label className="block mb-2 text-sm text-gray-700">
-                    Cardholder Name
+                    Kart Sahibinin Adı
                   </label>
                   <input
                     type="text"
@@ -228,7 +228,7 @@ export function Checkout() {
               </div>
 
               <div className="mt-6 bg-gray-50 rounded-xl p-4 flex items-center justify-between">
-                <span className="text-gray-700">Total Amount</span>
+                <span className="text-gray-700">Toplam Tutar</span>
                 <span className="text-2xl text-[var(--navy)]">
                   ${product.total}
                 </span>
@@ -239,7 +239,7 @@ export function Checkout() {
               onClick={handleProceed}
               className="w-full bg-[var(--electric-blue)] text-white py-4 rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors text-lg"
             >
-              {generatingDocs ? "Processing Payment..." : "Complete Payment"}
+              {generatingDocs ? "Ödeme işleniyor..." : "Ödemeyi Tamamla"}
             </button>
           </div>
         )}
@@ -251,10 +251,10 @@ export function Checkout() {
                 <Shield className="w-8 h-8 text-[var(--electric-blue)]" />
                 <div>
                   <h2 className="text-2xl text-[var(--navy)]">
-                    Automated Customs Declaration
+                    Otomatik Gümrük Beyanı
                   </h2>
                   <p className="text-gray-600">
-                    Your documents are being prepared automatically
+                    Belgeleriniz otomatik olarak hazırlanıyor
                   </p>
                 </div>
               </div>
@@ -262,26 +262,26 @@ export function Checkout() {
               <div className="space-y-4">
                 <DocumentItem
                   icon={<FileText className="w-5 h-5" />}
-                  title="Commercial Invoice"
-                  status="Generated"
+                  title="Ticari Fatura"
+                  status="Oluşturuldu"
                   color="green"
                 />
                 <DocumentItem
                   icon={<FileText className="w-5 h-5" />}
-                  title="Customs Declaration Form (CN23)"
-                  status="Generated"
+                  title="Gümrük Beyan Formu (CN23)"
+                  status="Oluşturuldu"
                   color="green"
                 />
                 <DocumentItem
                   icon={<Shield className="w-5 h-5" />}
-                  title="Citizen ID Verification"
-                  status="Verified"
+                  title="Kimlik Doğrulaması"
+                  status="Doğrulandı"
                   color="green"
                 />
                 <DocumentItem
                   icon={<MapPin className="w-5 h-5" />}
-                  title="Shipping Label & Tracking"
-                  status="Ready"
+                  title="Kargo Etiketi ve Takip"
+                  status="Hazır"
                   color="green"
                 />
               </div>
@@ -291,12 +291,11 @@ export function Checkout() {
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-green-800">
                     <div className="font-medium mb-1">
-                      All customs documents ready!
+                      Tüm gümrük belgeleri hazır!
                     </div>
                     <div>
-                      Your pre-verified Citizen ID has accelerated this process.
-                      Documents have been electronically submitted to customs
-                      authorities.
+                      Ön doğrulamalı kimlik bilginiz bu süreci hızlandırdı.
+                      Belgeler elektronik olarak gümrük yetkililerine iletildi.
                     </div>
                   </div>
                 </div>
@@ -307,7 +306,7 @@ export function Checkout() {
               onClick={handleProceed}
               className="w-full bg-[var(--electric-blue)] text-white py-4 rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors text-lg"
             >
-              View Tracking
+              Takibi Görüntüle
             </button>
           </div>
         )}

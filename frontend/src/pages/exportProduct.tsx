@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { fetchAllProducts } from "../utils/firestoreHelpers";
 import {
   FileText,
   Download,
@@ -91,15 +92,44 @@ const recentDocs = [
 export function ExportDocs() {
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
 
   const handleGenerate = (orderId: string) => {
     setGenerating(true);
     setSelectedOrder(orderId);
-    setTimeout(() => {
-      setGenerating(false);
-      alert("Export documents generated successfully!");
-    }, 2000);
+    (async () => {
+      try {
+        const items = await fetchAllProducts();
+        setProducts(items);
+        // demo: include fetched products count in the success message
+        setTimeout(() => {
+          setGenerating(false);
+          alert(
+            `Export documents generated successfully! Products fetched: ${items.length}`,
+          );
+        }, 1200);
+      } catch (err) {
+        console.error(err);
+        setGenerating(false);
+        alert("Failed to generate documents");
+      }
+    })();
   };
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const items = await fetchAllProducts();
+        if (mounted) setProducts(items);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -110,14 +140,14 @@ export function ExportDocs() {
             className="flex items-center gap-2 text-[var(--electric-blue)] hover:underline mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Seller Dashboard
+            Satıcı Paneline Dön
           </Link>
           <h1 className="text-3xl text-[var(--navy)] mb-2">
-            Export Documentation Center
+            Dışa Aktarım Belgeleri Merkezi
           </h1>
           <p className="text-gray-600">
-            Generate required customs and export documents for international
-            orders
+            Uluslararası siparişler için gerekli gümrük ve ihracat belgelerini
+            oluştur
           </p>
         </div>
       </div>
@@ -134,10 +164,10 @@ export function ExportDocs() {
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-6 border-b border-gray-200 bg-gray-50">
                 <h2 className="text-xl text-[var(--navy)]">
-                  Pending Export Orders
+                  Bekleyen Dışa Aktarım Siparişleri
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  Generate documentation for these orders
+                  Bu siparişler için belge oluştur
                 </p>
               </div>
 
@@ -151,16 +181,16 @@ export function ExportDocs() {
                             {order.id}
                           </h3>
                           <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
-                            Awaiting Documents
+                            Belgeler Bekleniyor
                           </span>
                         </div>
                         <div className="space-y-1 text-sm text-gray-600">
                           <div>
-                            <span className="font-medium">Product:</span>{" "}
+                            <span className="font-medium">Ürün:</span>{" "}
                             {order.product}
                           </div>
                           <div>
-                            <span className="font-medium">Buyer:</span>{" "}
+                            <span className="font-medium">Alıcı:</span>{" "}
                             {order.buyer}
                           </div>
                           <div className="flex items-center gap-4">
@@ -183,10 +213,10 @@ export function ExportDocs() {
                       >
                         {generating && selectedOrder === order.id
                           ? "Generating..."
-                          : "Generate All Documents"}
+                          : "Tüm Belgeleri Oluştur"}
                       </button>
                       <button className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm">
-                        Custom Selection
+                        Özel Seçim
                       </button>
                     </div>
 
@@ -194,9 +224,9 @@ export function ExportDocs() {
                       <p className="flex items-start gap-2">
                         <FileCheck className="w-4 h-4 mt-0.5 flex-shrink-0" />
                         <span>
-                          Documents will be auto-filled with product data,
-                          dimensions, and origin country. Includes: Commercial
-                          Invoice, Packing List, Certificate of Origin.
+                          Belgeler ürün verileri, ölçüler ve menşe ülke ile
+                          otomatik doldurulur. İçerir: Ticari Fatura, Paketleme
+                          Listesi, Menşe Sertifikası.
                         </span>
                       </p>
                     </div>
@@ -209,12 +239,11 @@ export function ExportDocs() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="text-lg text-[var(--navy)] mb-4">
-                Document Generator
+                Belge Oluşturucu
               </h3>
               <p className="text-sm text-gray-600 mb-6">
-                Our system automatically generates compliant export documents
-                based on your product information and destination country
-                regulations.
+                Sistemimiz, ürün bilgilerinize ve hedef ülke düzenlemelerine
+                göre uyumlu ihracat belgelerini otomatik oluşturur.
               </p>
 
               <div className="space-y-3">
@@ -222,10 +251,10 @@ export function ExportDocs() {
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <div className="text-[var(--navy)] mb-1">
-                      Auto-filled Details
+                      Otomatik Doldurulan Bilgiler
                     </div>
                     <div className="text-gray-600">
-                      Product info, EAN, dimensions, weight
+                      Ürün bilgisi, EAN, boyutlar, ağırlık
                     </div>
                   </div>
                 </div>
@@ -234,10 +263,10 @@ export function ExportDocs() {
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <div className="text-[var(--navy)] mb-1">
-                      Country-Specific Forms
+                      Ülkeye Özel Formlar
                     </div>
                     <div className="text-gray-600">
-                      Compliant with destination regulations
+                      Hedef ülke düzenlemelerine uyumlu
                     </div>
                   </div>
                 </div>
@@ -246,10 +275,10 @@ export function ExportDocs() {
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <div className="text-[var(--navy)] mb-1">
-                      Digital Signatures
+                      Dijital İmzalar
                     </div>
                     <div className="text-gray-600">
-                      Legally binding electronic documents
+                      Yasal olarak bağlayıcı elektronik belgeler
                     </div>
                   </div>
                 </div>
@@ -258,11 +287,9 @@ export function ExportDocs() {
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <div className="text-[var(--navy)] mb-1">
-                      Instant PDF Export
+                      Anında PDF Dışa Aktarım
                     </div>
-                    <div className="text-gray-600">
-                      Download and print immediately
-                    </div>
+                    <div className="text-gray-600">Hemen indir ve yazdır</div>
                   </div>
                 </div>
               </div>
@@ -270,7 +297,7 @@ export function ExportDocs() {
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="p-6 border-b border-gray-200 bg-gray-50">
-                <h3 className="text-lg text-[var(--navy)]">Recent Documents</h3>
+                <h3 className="text-lg text-[var(--navy)]">Son Belgeler</h3>
               </div>
 
               <div className="divide-y divide-gray-200">
@@ -299,7 +326,7 @@ export function ExportDocs() {
 
               <div className="p-4 border-t border-gray-200">
                 <button className="w-full text-[var(--electric-blue)] hover:underline text-sm">
-                  View All Documents
+                  Tüm Belgeleri Görüntüle
                 </button>
               </div>
             </div>

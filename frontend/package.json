@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@firebase/firestore": "^4.14.0",
     "classnames": "^2.5.1",
+    "firebase": "^12.12.1",
     "lucide-react": "^1.14.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

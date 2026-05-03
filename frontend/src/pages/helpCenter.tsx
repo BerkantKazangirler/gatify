@@ -3,75 +3,109 @@ import { Search, ChevronDown, HelpCircle, Shield, Package, CreditCard, RefreshCw
 import { Link } from "react-router";
 
 const categories = [
-  { id: "customs", name: "Customs Regulations", icon: <Shield className="w-5 h-5" />, count: 12 },
-  { id: "shipping", name: "Shipping Policies", icon: <Package className="w-5 h-5" />, count: 8 },
-  { id: "payments", name: "Payments & Pricing", icon: <CreditCard className="w-5 h-5" />, count: 6 },
-  { id: "refunds", name: "Refunds & Returns", icon: <RefreshCw className="w-5 h-5" />, count: 5 },
+  {
+    id: "customs",
+    name: "Gümrük Kuralları",
+    icon: <Shield className="w-5 h-5" />,
+    count: 12,
+  },
+  {
+    id: "shipping",
+    name: "Kargo Politikaları",
+    icon: <Package className="w-5 h-5" />,
+    count: 8,
+  },
+  {
+    id: "payments",
+    name: "Ödeme ve Fiyatlandırma",
+    icon: <CreditCard className="w-5 h-5" />,
+    count: 6,
+  },
+  {
+    id: "refunds",
+    name: "İade ve Geri Dönüş",
+    icon: <RefreshCw className="w-5 h-5" />,
+    count: 5,
+  },
 ];
 
 const faqs = {
   customs: [
     {
-      question: "How does Gatify handle customs clearance?",
-      answer: "Gatify automates customs declaration using your pre-verified Citizen ID. We generate all required forms (Commercial Invoice, CN23) and submit them electronically to customs authorities. Our system calculates duties and taxes upfront, so there are no surprises. Average clearance time is 2-3 days.",
+      question: "Gatify gümrük işlemlerini nasıl yönetir?",
+      answer:
+        "Gatify, önceden doğrulanmış kimlik bilgini kullanarak gümrük beyanını otomatikleştirir. Gerekli tüm formları (Ticari Fatura, CN23) oluşturur ve gümrük yetkililerine elektronik olarak iletir. Sistemimiz vergileri ve harçları önceden hesaplar, böylece sürpriz olmaz. Ortalama işlem süresi 2-3 gündür.",
     },
     {
-      question: "What if my package gets stuck in customs?",
-      answer: "If your shipment is held for more than 5 days, our Customs Red Alert system activates. You'll see this on your tracking page with an 'Auto-Generate Petition PDF' button. Click it to generate a properly formatted customs petition document that you can submit to authorities. Our support team can also assist with escalations.",
+      question: "Paketim gümrükte takılırsa ne olur?",
+      answer:
+        "Gönderin 5 günden fazla bekletilirse Gümrük Kırmızı Alarm sistemimiz devreye girer. Bunu takip sayfanda 'Dilekçe PDF'ini Otomatik Oluştur' butonuyla görürsün. Buna basarak yetkililere sunabileceğin uygun biçimde hazırlanmış bir gümrük dilekçesi oluşturursun. Destek ekibimiz de gerekirse süreci hızlandırmaya yardımcı olur.",
     },
     {
-      question: "Are customs taxes and VAT included in the price?",
-      answer: "No, customs taxes and VAT are calculated separately and shown in the Tax Breakdown on product pages. The 'Worth It?' score factors in ALL costs (base price + shipping + customs + VAT) to help you decide if the deal is good after all fees.",
+      question: "Gümrük vergileri ve KDV fiyata dahil mi?",
+      answer:
+        "Hayır, gümrük vergileri ve KDV ayrı hesaplanır ve ürün sayfalarındaki vergi dağılımında gösterilir. 'Değer mi?' skoru, tüm masrafları (baz fiyat + kargo + gümrük + KDV) hesaba katar ve toplam maliyetten sonra fırsatın iyi olup olmadığını anlamana yardımcı olur.",
     },
     {
-      question: "Which countries does Gatify support for customs?",
-      answer: "We currently support automated customs processing for 150+ countries. Our system has up-to-date customs rates and regulations for major markets including USA, UK, EU countries, Japan, Australia, and Canada. Check the product detail page for country-specific estimates.",
+      question: "Gatify hangi ülkelerde gümrük desteği sağlar?",
+      answer:
+        "Şu anda 150'den fazla ülke için otomatik gümrük işlemi desteği sunuyoruz. Sistemimiz ABD, Birleşik Krallık, AB ülkeleri, Japonya, Avustralya ve Kanada gibi büyük pazarlar için güncel oran ve düzenlemelere sahiptir. Ülkeye özel tahminler için ürün detay sayfasını kontrol et.",
     },
   ],
   shipping: [
     {
-      question: "What are the shipping options?",
-      answer: "We offer two shipping methods: Air Freight (faster, 5-7 days) and Sea Freight (economical, 21-28 days). Prices vary by origin country and package weight. You can compare both options on the product detail page with real-time ETA predictions including customs clearance time.",
+      question: "Kargo seçenekleri nelerdir?",
+      answer:
+        "İki gönderim yöntemi sunuyoruz: Hava Kargosu (daha hızlı, 5-7 gün) ve Deniz Kargosu (daha ekonomik, 21-28 gün). Fiyatlar çıkış ülkesine ve paket ağırlığına göre değişir. Ürün detay sayfasında gümrük süresi dahil gerçek zamanlı varış tahminleriyle her iki seçeneği karşılaştırabilirsin.",
     },
     {
-      question: "How accurate are the delivery estimates?",
-      answer: "Our delivery estimates include transit time PLUS predicted customs clearance duration based on historical data for your destination. Air freight typically clears in 2-3 days, sea freight in 3-5 days. We update ETAs in real-time if customs processing is faster or slower than expected.",
+      question: "Teslimat tahminleri ne kadar doğru?",
+      answer:
+        "Teslimat tahminlerimiz, transit süresine ek olarak varış noktan için geçmiş verilere dayalı tahmini gümrük süresini de içerir. Hava kargosu genellikle 2-3 günde, deniz kargosu 3-5 günde gümrükten çıkar. Gümrük işlemleri beklenenden hızlı veya yavaş olursa varış saatlerini gerçek zamanlı güncelleriz.",
     },
     {
-      question: "Can I track my shipment in real-time?",
-      answer: "Yes! Our Tracking page shows your shipment's journey on an interactive map with live updates. You'll see each milestone: Order Placed → Dispatched → In Transit → Customs Clearance → Out for Delivery. We send email and push notifications for major status changes.",
+      question: "Gönderimi gerçek zamanlı takip edebilir miyim?",
+      answer:
+        "Evet! Takip sayfamız, gönderinin yolculuğunu canlı güncellemelerle etkileşimli bir harita üzerinde gösterir. Sipariş Verildi → Sevk Edildi → Yolda → Gümrükten Geçiş → Teslimata Çıktı adımlarını görürsün. Önemli durum değişiklikleri için e-posta ve anlık bildirim göndeririz.",
     },
     {
-      question: "What happens if my shipment is lost or damaged?",
-      answer: "All international shipments are insured up to the declared value. If your package is lost or arrives damaged, file a claim through our Support Ticket system (attach photos for damage claims). We'll process refunds or replacements within 5-7 business days after verification.",
+      question: "Gönderim kaybolursa veya hasar görürse ne olur?",
+      answer:
+        "Tüm uluslararası gönderiler beyan edilen değere kadar sigortalıdır. Paket kaybolursa veya hasarlı gelirse, Destek Talebi sistemi üzerinden başvuru oluştur (hasar talepleri için fotoğraf ekle). Doğrulamadan sonra 5-7 iş günü içinde iade veya değişim işlemini tamamlarız.",
     },
   ],
   payments: [
     {
       question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards (Visa, Mastercard, Amex), debit cards, and PayPal. Payment is processed securely at checkout. We do NOT charge your card until your order ships, so if a seller cancels, you won't be charged.",
+      answer:
+        "We accept all major credit cards (Visa, Mastercard, Amex), debit cards, and PayPal. Payment is processed securely at checkout. We do NOT charge your card until your order ships, so if a seller cancels, you won't be charged.",
     },
     {
       question: "Why is the global price different from local prices?",
-      answer: "Global prices are what sellers in other countries charge for the same product. Price differences exist due to local demand, taxes, import duties already paid by local retailers, and currency exchange rates. Gatify helps you find products where the global price + shipping + customs is still cheaper than buying locally.",
+      answer:
+        "Global prices are what sellers in other countries charge for the same product. Price differences exist due to local demand, taxes, import duties already paid by local retailers, and currency exchange rates. Gatify helps you find products where the global price + shipping + customs is still cheaper than buying locally.",
     },
     {
       question: "What is the 'Worth It?' score?",
-      answer: "The Worth It? score is calculated as: (Local Price - Total Cost) / Local Price × 100. It shows your savings percentage AFTER all fees (shipping, customs, VAT). A score of 70%+ (green) means you're getting an excellent deal. Below 70% (yellow) is still a good deal but with smaller margins.",
+      answer:
+        "The Worth It? score is calculated as: (Local Price - Total Cost) / Local Price × 100. It shows your savings percentage AFTER all fees (shipping, customs, VAT). A score of 70%+ (green) means you're getting an excellent deal. Below 70% (yellow) is still a good deal but with smaller margins.",
     },
   ],
   refunds: [
     {
       question: "What is your refund policy?",
-      answer: "You can request a refund within 30 days of delivery if the product is defective, significantly different from the description, or doesn't arrive. Buyer's remorse (changed your mind) is handled case-by-case. Refunds are processed to your original payment method within 5-7 business days.",
+      answer:
+        "You can request a refund within 30 days of delivery if the product is defective, significantly different from the description, or doesn't arrive. Buyer's remorse (changed your mind) is handled case-by-case. Refunds are processed to your original payment method within 5-7 business days.",
     },
     {
       question: "Who pays for return shipping on refunds?",
-      answer: "If the product is defective or not as described, we cover return shipping. If you're returning due to buyer's remorse and the seller accepts the return, you'll pay return shipping costs. Note: international return shipping can be expensive—check with our support team for the most economical method.",
+      answer:
+        "If the product is defective or not as described, we cover return shipping. If you're returning due to buyer's remorse and the seller accepts the return, you'll pay return shipping costs. Note: international return shipping can be expensive—check with our support team for the most economical method.",
     },
     {
       question: "Can I cancel an order after placing it?",
-      answer: "Yes, but only before the seller ships it. Once the order status changes to 'Dispatched', cancellation is no longer possible. If you need to cancel, go to your order in the Tracking page and click 'Request Cancellation' immediately. Most sellers respond within 24 hours.",
+      answer:
+        "Yes, but only before the seller ships it. Once the order status changes to 'Dispatched', cancellation is no longer possible. If you need to cancel, go to your order in the Tracking page and click 'Request Cancellation' immediately. Most sellers respond within 24 hours.",
     },
   ],
 };

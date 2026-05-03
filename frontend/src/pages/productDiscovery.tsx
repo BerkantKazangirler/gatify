@@ -1,105 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Filter, MapPin, TrendingDown, Search, X } from "lucide-react";
-
-const products = [
-  {
-    id: 1,
-    name: "Sony WH-1000XM5 Headphones",
-    category: "Electronics",
-    globalPrice: 299,
-    localPrice: 449,
-    savings: 150,
-    savingsPercent: 33,
-    country: "USA",
-    risk: "Low",
-    image: "🎧",
-  },
-  {
-    id: 2,
-    name: "Dyson V15 Detect Vacuum",
-    category: "Home",
-    globalPrice: 549,
-    localPrice: 799,
-    savings: 250,
-    savingsPercent: 31,
-    country: "UK",
-    risk: "Low",
-    image: "🧹",
-  },
-  {
-    id: 3,
-    name: "Apple AirPods Pro 2",
-    category: "Electronics",
-    globalPrice: 189,
-    localPrice: 279,
-    savings: 90,
-    savingsPercent: 32,
-    country: "Japan",
-    risk: "Medium",
-    image: "🎵",
-  },
-  {
-    id: 4,
-    name: "Lego Millennium Falcon",
-    category: "Toys",
-    globalPrice: 849,
-    localPrice: 1199,
-    savings: 350,
-    savingsPercent: 29,
-    country: "Germany",
-    risk: "Low",
-    image: "🚀",
-  },
-  {
-    id: 5,
-    name: "Nike Air Max 2024",
-    category: "Fashion",
-    globalPrice: 159,
-    localPrice: 229,
-    savings: 70,
-    savingsPercent: 31,
-    country: "Vietnam",
-    risk: "Low",
-    image: "👟",
-  },
-  {
-    id: 6,
-    name: "Samsung Galaxy S24 Ultra",
-    category: "Electronics",
-    globalPrice: 1099,
-    localPrice: 1499,
-    savings: 400,
-    savingsPercent: 27,
-    country: "South Korea",
-    risk: "Medium",
-    image: "📱",
-  },
-  {
-    id: 7,
-    name: "KitchenAid Stand Mixer",
-    category: "Home",
-    globalPrice: 379,
-    localPrice: 549,
-    savings: 170,
-    savingsPercent: 31,
-    country: "USA",
-    risk: "Low",
-    image: "🍰",
-  },
-  {
-    id: 8,
-    name: "Canon EOS R6 Mark II",
-    category: "Electronics",
-    globalPrice: 2399,
-    localPrice: 3199,
-    savings: 800,
-    savingsPercent: 25,
-    country: "Japan",
-    risk: "Medium",
-    image: "📷",
-  },
-];
+import { fetchAllProducts } from "../utils/firestoreHelpers";
 
 export function ProductDiscovery() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -109,8 +11,54 @@ export function ProductDiscovery() {
   const [maxPrice, setMaxPrice] = useState(5000);
   const [sortBy, setSortBy] = useState("relevance");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [productsList, setProductsList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredProducts = products.filter((product) => {
+  useEffect(() => {
+    let mounted = true;
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const items = await fetchAllProducts();
+        if (mounted) setProductsList(items);
+      } catch (e: any) {
+        console.error(e);
+        if (mounted) setError(e.message || "Failed to fetch products");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchProducts();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const syncLocalSamples = async () => {
+    for (const p of products) {
+      const payload = {
+        name: p.name,
+        price: p.globalPrice,
+        localPrice: p.localPrice,
+        origin: p.country,
+        photo: p.image,
+        stock: p.stock ?? 10,
+        salerId: "salerTest",
+        categoryId: p.category,
+        description: p.description ?? "",
+      };
+      try {
+        await saveProduct(payload);
+      } catch (err) {
+        console.error("sync failed", err);
+      }
+    }
+    const items = await fetchAllProducts();
+    setProductsList(items);
+  };
+
+  const filteredProducts = productsList.filter((product) => {
     const matchesCategory =
       selectedCategory === "All" || product.category === selectedCategory;
     const matchesRisk = selectedRisk === "All" || product.risk === selectedRisk;
@@ -121,6 +69,22 @@ export function ProductDiscovery() {
       product.globalPrice >= minPrice && product.globalPrice <= maxPrice;
     return matchesCategory && matchesRisk && matchesSearch && matchesPrice;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Ürünler yükleniyor…</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -135,8 +99,18 @@ export function ProductDiscovery() {
     }
   });
 
-  const categories = ["All", "Electronics", "Fashion", "Home", "Toys"];
-  const riskLevels = ["All", "Low", "Medium"];
+  const categories = [
+    { value: "All", label: "Tümü" },
+    { value: "Electronics", label: "Elektronik" },
+    { value: "Fashion", label: "Moda" },
+    { value: "Home", label: "Ev" },
+    { value: "Toys", label: "Oyuncak" },
+  ];
+  const riskLevels = [
+    { value: "All", label: "Tümü" },
+    { value: "Low", label: "Düşük" },
+    { value: "Medium", label: "Orta" },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -147,10 +121,11 @@ export function ProductDiscovery() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl md:text-4xl font-space-grotesk text-foreground mb-1">
-                  Global Products
+                  Küresel Ürünler
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Discover products with customs automation & arbitrage insights
+                  Gümrük otomasyonu ve fiyat avantajı içgörüleriyle ürünleri
+                  keşfet
                 </p>
               </div>
               <button
@@ -158,7 +133,7 @@ export function ProductDiscovery() {
                 className="md:hidden flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-secondary"
               >
                 <Filter className="w-5 h-5" />
-                Filters
+                Filtreler
               </button>
             </div>
 
@@ -169,8 +144,16 @@ export function ProductDiscovery() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-secondary text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                placeholder="Search products..."
+                placeholder="Ürün ara..."
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={syncLocalSamples}
+                className="hidden md:inline-flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-secondary"
+              >
+                Örnekleri eşitle
+              </button>
             </div>
           </div>
         </div>
@@ -188,7 +171,7 @@ export function ProductDiscovery() {
           <div className="p-6">
             <div className="flex items-center justify-between mb-6 md:mb-0">
               <h2 className="text-lg font-space-grotesk text-foreground">
-                Filters
+                Filtreler
               </h2>
               <button
                 onClick={() => setShowMobileFilters(false)}
@@ -201,23 +184,23 @@ export function ProductDiscovery() {
             {/* Category Filter */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-foreground mb-3">
-                Category
+                Kategori
               </h3>
               <div className="space-y-2">
                 {categories.map((cat) => (
                   <label
-                    key={cat}
+                    key={cat.value}
                     className="flex items-center gap-3 cursor-pointer hover:bg-secondary p-2 rounded"
                   >
                     <input
                       type="radio"
                       name="category"
-                      value={cat}
-                      checked={selectedCategory === cat}
+                      value={cat.value}
+                      checked={selectedCategory === cat.value}
                       onChange={(e) => setSelectedCategory(e.target.value)}
                       className="w-4 h-4 accent-accent"
                     />
-                    <span className="text-sm text-foreground">{cat}</span>
+                    <span className="text-sm text-foreground">{cat.label}</span>
                   </label>
                 ))}
               </div>
@@ -226,23 +209,25 @@ export function ProductDiscovery() {
             {/* Risk Level Filter */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-foreground mb-3">
-                Customs Risk
+                Gümrük Riski
               </h3>
               <div className="space-y-2">
                 {riskLevels.map((risk) => (
                   <label
-                    key={risk}
+                    key={risk.value}
                     className="flex items-center gap-3 cursor-pointer hover:bg-secondary p-2 rounded"
                   >
                     <input
                       type="radio"
                       name="risk"
-                      value={risk}
-                      checked={selectedRisk === risk}
+                      value={risk.value}
+                      checked={selectedRisk === risk.value}
                       onChange={(e) => setSelectedRisk(e.target.value)}
                       className="w-4 h-4 accent-accent"
                     />
-                    <span className="text-sm text-foreground">{risk}</span>
+                    <span className="text-sm text-foreground">
+                      {risk.label}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -251,7 +236,7 @@ export function ProductDiscovery() {
             {/* Price Filter */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-foreground mb-4">
-                Price Range
+                Fiyat Aralığı
               </h3>
               <div className="space-y-3">
                 <div>
@@ -287,7 +272,7 @@ export function ProductDiscovery() {
               }}
               className="w-full px-4 py-2 border border-border rounded-lg text-sm text-foreground hover:bg-secondary transition-colors"
             >
-              Reset Filters
+              Filtreleri Sıfırla
             </button>
           </div>
         </aside>
@@ -300,21 +285,21 @@ export function ProductDiscovery() {
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-2">
                   <Filter className="w-4 h-4" />
-                  {sortedProducts.length} products
+                  {sortedProducts.length} ürün
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Sort by:</span>
+                <span className="text-sm text-muted-foreground">Sırala:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="px-3 py-1.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent"
                 >
-                  <option value="relevance">Relevance</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="savings">Best Savings</option>
+                  <option value="relevance">Alaka düzeyi</option>
+                  <option value="price-low">Fiyat: düşükten yükseğe</option>
+                  <option value="price-high">Fiyat: yüksekten düşüğe</option>
+                  <option value="savings">En iyi tasarruf</option>
                 </select>
               </div>
             </div>
@@ -359,7 +344,7 @@ export function ProductDiscovery() {
                                 : "bg-warning/20 text-warning"
                             }`}
                           >
-                            {product.risk} Risk
+                            {product.risk} risk
                           </span>
                         </div>
 
@@ -367,7 +352,7 @@ export function ProductDiscovery() {
                         <div className="space-y-2 py-3 border-t border-b border-border mb-3">
                           <div className="flex items-baseline justify-between">
                             <span className="text-xs text-muted-foreground">
-                              Global
+                              Küresel
                             </span>
                             <span className="text-lg font-medium text-accent">
                               ${product.globalPrice}
@@ -375,7 +360,7 @@ export function ProductDiscovery() {
                           </div>
                           <div className="flex items-baseline justify-between">
                             <span className="text-xs text-muted-foreground">
-                              Local
+                              Yerel
                             </span>
                             <span className="text-sm text-muted-foreground line-through">
                               ${product.localPrice}
@@ -386,8 +371,8 @@ export function ProductDiscovery() {
                         {/* Savings */}
                         <div className="flex items-center justify-between mt-auto">
                           <span className="flex items-center gap-1 text-success text-sm font-medium">
-                            <TrendingDown className="w-4 h-4" />
-                            Save ${product.savings}
+                            <TrendingDown className="w-4 h-4" />$
+                            {product.savings} tasarruf
                           </span>
                           <span className="text-lg font-bold text-success">
                             {product.savingsPercent}%
@@ -402,10 +387,10 @@ export function ProductDiscovery() {
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-space-grotesk text-foreground mb-2">
-                  No products found
+                  Ürün bulunamadı
                 </h3>
                 <p className="text-muted-foreground">
-                  Try adjusting your filters or search query
+                  Filtrelerini veya arama terimini değiştir
                 </p>
               </div>
             )}
