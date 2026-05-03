@@ -35,39 +35,13 @@ export function ProductDiscovery() {
     };
   }, []);
 
-  // const syncLocalSamples = async () => {
-  //   for (const p of products) {
-  //     const payload = {
-  //       name: p.name,
-  //       price: p.globalPrice,
-  //       localPrice: p.localPrice,
-  //       origin: p.country,
-  //       photo: p.image,
-  //       stock: p.stock ?? 10,
-  //       salerId: "salerTest",
-  //       categoryId: p.category,
-  //       description: p.description ?? "",
-  //     };
-  //     try {
-  //       await saveProduct(payload);
-  //     } catch (err) {
-  //       console.error("sync failed", err);
-  //     }
-  //   }
-  //   const items = await fetchAllProducts();
-  //   setProductsList(items);
-  // };
-
   const filteredProducts = productsList.filter((product) => {
     const matchesCategory =
       selectedCategory === "All" || product.category === selectedCategory;
-    const matchesRisk = selectedRisk === "All" || product.risk === selectedRisk;
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesPrice =
-      product.globalPrice >= minPrice && product.globalPrice <= maxPrice;
-    return matchesCategory && matchesRisk && matchesSearch && matchesPrice;
+    return matchesCategory && matchesSearch;
   });
 
   if (loading) {
@@ -101,10 +75,10 @@ export function ProductDiscovery() {
 
   const categories = [
     { value: "All", label: "Tümü" },
-    { value: "Electronics", label: "Elektronik" },
-    { value: "Fashion", label: "Moda" },
-    { value: "Home", label: "Ev" },
-    { value: "Toys", label: "Oyuncak" },
+    { value: "electronics", label: "Elektronik" },
+    { value: "fashion", label: "Moda" },
+    { value: "home", label: "Ev" },
+    { value: "accessories", label: "Aksesuar" },
   ];
   const riskLevels = [
     { value: "All", label: "Tümü" },
@@ -114,7 +88,6 @@ export function ProductDiscovery() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
           <div className="flex flex-col gap-4">
@@ -148,10 +121,7 @@ export function ProductDiscovery() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <button
-                // onClick={syncLocalSamples}
-                className="hidden md:inline-flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-secondary"
-              >
+              <button className="hidden md:inline-flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-secondary">
                 Örnekleri eşitle
               </button>
             </div>
@@ -160,7 +130,6 @@ export function ProductDiscovery() {
       </div>
 
       <div className="flex">
-        {/* Sidebar Filters */}
         <aside
           className={`fixed md:static inset-0 md:inset-auto w-64 bg-white border-r border-border overflow-y-auto transition-all duration-300 z-30 md:z-0 ${
             showMobileFilters
@@ -181,7 +150,6 @@ export function ProductDiscovery() {
               </button>
             </div>
 
-            {/* Category Filter */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-foreground mb-3">
                 Kategori
@@ -206,7 +174,6 @@ export function ProductDiscovery() {
               </div>
             </div>
 
-            {/* Risk Level Filter */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-foreground mb-3">
                 Gümrük Riski
@@ -233,7 +200,6 @@ export function ProductDiscovery() {
               </div>
             </div>
 
-            {/* Price Filter */}
             <div className="mb-8">
               <h3 className="text-sm font-medium text-foreground mb-4">
                 Fiyat Aralığı
@@ -262,7 +228,6 @@ export function ProductDiscovery() {
               </div>
             </div>
 
-            {/* Reset Filters */}
             <button
               onClick={() => {
                 setSelectedCategory("All");
@@ -277,9 +242,7 @@ export function ProductDiscovery() {
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1">
-          {/* Sort and Count */}
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-6 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -305,7 +268,6 @@ export function ProductDiscovery() {
             </div>
           </div>
 
-          {/* Products Grid */}
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
             {sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
@@ -316,24 +278,35 @@ export function ProductDiscovery() {
                     className="group h-full"
                   >
                     <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-accent transition-all duration-300 h-full flex flex-col">
-                      {/* Image */}
-                      <div className="aspect-square bg-gradient-to-br from-secondary to-muted flex items-center justify-center text-5xl md:text-6xl group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                        {product.image}
+                      <div className="aspect-square bg-gradient-to-br from-secondary to-muted flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                        {product.raw?.thumbnail &&
+                        product.raw.thumbnail.startsWith("http") ? (
+                          <img
+                            src={product.raw.thumbnail}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                              const parent = e.currentTarget.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `<span class="text-5xl md:text-6xl">${product.image || "📦"}</span>`;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="text-5xl md:text-6xl">{"📦"}</span>
+                        )}
                       </div>
 
-                      {/* Content */}
                       <div className="p-4 flex flex-col flex-1">
-                        {/* Category Badge */}
                         <span className="inline-block w-fit px-2 py-1 mb-2 bg-secondary text-accent text-xs rounded-full">
                           {product.category}
                         </span>
 
-                        {/* Title */}
                         <h3 className="font-medium text-card-foreground line-clamp-2 mb-2 group-hover:text-accent transition-colors min-h-[2.5rem]">
                           {product.name}
                         </h3>
 
-                        {/* Rating and Country */}
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
                           <MapPin className="w-3 h-3" />
                           <span>{product.country}</span>
@@ -348,7 +321,6 @@ export function ProductDiscovery() {
                           </span>
                         </div>
 
-                        {/* Prices */}
                         <div className="space-y-2 py-3 border-t border-b border-border mb-3">
                           <div className="flex items-baseline justify-between">
                             <span className="text-xs text-muted-foreground">
@@ -368,7 +340,6 @@ export function ProductDiscovery() {
                           </div>
                         </div>
 
-                        {/* Savings */}
                         <div className="flex items-center justify-between mt-auto">
                           <span className="flex items-center gap-1 text-success text-sm font-medium">
                             <TrendingDown className="w-4 h-4" />$
@@ -398,7 +369,6 @@ export function ProductDiscovery() {
         </main>
       </div>
 
-      {/* Mobile overlay */}
       {showMobileFilters && (
         <div
           className="fixed inset-0 bg-black/50 z-20 md:hidden"

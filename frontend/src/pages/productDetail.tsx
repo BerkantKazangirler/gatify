@@ -26,6 +26,20 @@ export function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  interface TaxRates {
+    customs: number;
+    trt: number;
+    oetv: number;
+    vat: number;
+  }
+
+  const CATEGORY_TAXES: Record<string, TaxRates> = {
+    electronics: { customs: 0.2, trt: 0.12, oetv: 0.2, vat: 0.2 },
+    fragrances: { customs: 0.2, trt: 0, oetv: 0.2, vat: 0.2 },
+    fashion: { customs: 0.2, trt: 0, oetv: 0, vat: 0.2 },
+    accessories: { customs: 0.2, trt: 0, oetv: 0.05, vat: 0.2 },
+  };
+
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -73,13 +87,40 @@ export function ProductDetail() {
   };
 
   const selected = shipping[selectedShipping];
-  const basePrice = product.globalPrice;
-  const shippingCost = selected.cost;
-  const customsTax = Math.round(basePrice * 0.18);
-  const vat = Math.round((basePrice + customsTax) * 0.15);
-  const totalPrice = basePrice + shippingCost + customsTax + vat;
-  const totalSavings = product.localPrice - totalPrice;
-  const worthItScore = Math.round((totalSavings / product.localPrice) * 100);
+  // 1. Verileri Sayısallaştırma ve Güvenli Okuma
+  // Firestore'dan gelen veriler string veya undefined olsa bile matematik bozulmaz
+  const basePrice = Number(product.globalPrice || product.raw?.price || 0);
+  const localPrice = Number(product.localPrice || product.raw?.localPrice || 0);
+  const shippingCost = Number(shipping[selectedShipping]?.cost || 0);
+
+  // 2. Kategori Bazlı Vergi Hesaplama (Şubat 2026 Mevzuatı)
+  const taxes =
+    CATEGORY_TAXES[product.category as string] || CATEGORY_TAXES.fashion;
+
+  // A. TRT Bandrolü: Sadece ana bedel üzerinden
+  const trtTax = basePrice * taxes.trt;
+  const customsTax = basePrice * taxes.customs;
+  const oetvTax = (basePrice + customsTax + trtTax) * taxes.oetv;
+  const vat = (basePrice + customsTax + trtTax + oetvTax) * taxes.vat;
+
+  const totalTax = trtTax + customsTax + oetvTax + vat;
+  const totalImportPrice = basePrice + totalTax + shippingCost; // Toplam maliyet
+  // 3. Tasarruf ve Dinamik Skorlama (Worth It Score)
+  const totalSavings = localPrice - totalImportPrice;
+  let worthItScore: number;
+  if (!localPrice || localPrice === 0) {
+    worthItScore = 50;
+  } else {
+    const savingsRatio = totalSavings / localPrice;
+    if (totalSavings > 0) {
+      worthItScore = Math.round(50 + savingsRatio * 45);
+    } else {
+      // Ürün TR'den daha pahalıya geliyorsa zararın büyüklüğüne göre %5-45 arası skor
+      const lossRatio = Math.abs(totalSavings) / localPrice;
+      worthItScore = Math.round(Math.max(5, 45 - lossRatio * 50));
+    }
+  }
+  worthItScore = Math.min(95, Math.max(5, worthItScore));
 
   // Görselleri hazırlarız; API'den gelen dizi (images) yoksa default image kullanıp dizi oluşturur.
   const productImages = product.images?.length
@@ -340,6 +381,13 @@ export function ProductDetail() {
 
             <div className="space-y-3 mb-6">
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-600">Local Fiyat</span>
+                <span className="text-lg text-[var(--navy)]">
+                  ${localPrice}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-600">Baz Fiyat</span>
                 <span className="text-lg text-[var(--navy)]">${basePrice}</span>
               </div>
@@ -354,14 +402,16 @@ export function ProductDetail() {
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">Gümrük Vergisi (%18)</span>
+                <span className="text-gray-600">
+                  Gümrük Vergisi (%{taxes.customs * 100})
+                </span>
                 <span className="text-lg text-[var(--navy)]">
                   ${customsTax}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">KDV (%15)</span>
+                <span className="text-gray-600">KDV (%{taxes.vat * 100})</span>
                 <span className="text-lg text-[var(--navy)]">${vat}</span>
               </div>
 
@@ -370,7 +420,7 @@ export function ProductDetail() {
                   Toplam Maliyet
                 </span>
                 <span className="text-2xl text-[var(--navy)]">
-                  ${totalPrice}
+                  ${totalImportPrice.toFixed(2)}
                 </span>
               </div>
 
@@ -379,7 +429,9 @@ export function ProductDetail() {
                   <TrendingDown className="w-5 h-5" />
                   <span>Sen Kazanıyorsun</span>
                 </span>
-                <span className="text-2xl text-green-700">${totalSavings}</span>
+                <span className="text-2xl text-green-700">
+                  ${totalSavings > 0 ? totalSavings.toFixed(2) : "0.00"}
+                </span>
               </div>
             </div>
 
