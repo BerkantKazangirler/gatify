@@ -6,7 +6,9 @@ import {
   FileText,
   CheckCircle,
   CreditCard,
-  MapPin,} from "lucide-react";
+} from "lucide-react";
+import { triggerCustomsEmail } from "../components/customsStep";
+import { useAuth } from "../context/AuthContext";
 
 export function Checkout() {
   const { id } = useParams();
@@ -14,7 +16,10 @@ export function Checkout() {
   const [step, setStep] = useState<
     "review" | "payment" | "customs" | "complete"
   >("review");
+  const { user } = useAuth();
   const [generatingDocs, setGeneratingDocs] = useState(false);
+
+  const userEmail = user?.email || "misafir@example.com";
 
   const product = {
     name: "Sony WH-1000XM5 Headphones",
@@ -25,15 +30,29 @@ export function Checkout() {
     total: 441,
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (step === "review") {
       setStep("payment");
     } else if (step === "payment") {
       setGeneratingDocs(true);
-      setTimeout(() => {
-        setGeneratingDocs(false);
-        setStep("customs");
-      }, 2000);
+
+      // 1. Gümrük belgeleri için gerekli veri paketini hazırla
+      const calculationData = {
+        basePrice: Number(product.price),
+        totalTax: Number(product.customs) + Number(product.vat),
+        totalImportPrice: Number(product.total),
+        totalSavings: 0, // Veya hesaplanan değer
+      };
+
+      // 2. Ödeme simülasyonunu bekle
+      await new Promise((res) => setTimeout(res, 2000));
+
+      // 3. Fonksiyonu 3 parametre ile çağır (Hata burada çözülüyor)
+      await triggerCustomsEmail(product, calculationData, userEmail);
+      console.log("Mail tetikleniyor...", userEmail);
+
+      setGeneratingDocs(false);
+      setStep("customs");
     } else if (step === "customs") {
       setStep("complete");
       setTimeout(() => {
@@ -274,14 +293,8 @@ export function Checkout() {
                 />
                 <DocumentItem
                   icon={<Shield className="w-5 h-5" />}
-                  title="Kimlik Doğrulaması"
-                  status="Doğrulandı"
-                  color="green"
-                />
-                <DocumentItem
-                  icon={<MapPin className="w-5 h-5" />}
-                  title="Kargo Etiketi ve Takip"
-                  status="Hazır"
+                  title="E-Posta Bildirimi (Resend)"
+                  status="Gönderildi"
                   color="green"
                 />
               </div>
@@ -291,11 +304,11 @@ export function Checkout() {
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-green-800">
                     <div className="font-medium mb-1">
-                      Tüm gümrük belgeleri hazır!
+                      Tüm gümrük belgeleri ve e-faturanız hazır!
                     </div>
                     <div>
-                      Ön doğrulamalı kimlik bilginiz bu süreci hızlandırdı.
-                      Belgeler elektronik olarak gümrük yetkililerine iletildi.
+                      Belgeler elektronik olarak gümrük yetkililerine iletildi
+                      ve kopyası e-posta adresinize gönderildi.
                     </div>
                   </div>
                 </div>

@@ -11,11 +11,12 @@ import {
   Ship,
   LogIn,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isLoggedIn] = useState(false);
+  const { user } = useAuth();
   const [selectedShipping, setSelectedShipping] = useState<"air" | "sea">(
     "air",
   );
@@ -383,13 +384,15 @@ export function ProductDetail() {
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-600">Local Fiyat</span>
                 <span className="text-lg text-[var(--navy)]">
-                  ${localPrice}
+                  ${localPrice.toFixed(2)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-600">Baz Fiyat</span>
-                <span className="text-lg text-[var(--navy)]">${basePrice}</span>
+                <span className="text-lg text-[var(--navy)]">
+                  ${basePrice.toFixed(2)}
+                </span>
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
@@ -397,7 +400,7 @@ export function ProductDetail() {
                   Kargo ({selectedShipping === "air" ? "Hava" : "Deniz"})
                 </span>
                 <span className="text-lg text-[var(--navy)]">
-                  ${shippingCost}
+                  ${shippingCost.toFixed(2)}
                 </span>
               </div>
 
@@ -406,13 +409,15 @@ export function ProductDetail() {
                   Gümrük Vergisi (%{taxes.customs * 100})
                 </span>
                 <span className="text-lg text-[var(--navy)]">
-                  ${customsTax}
+                  ${customsTax.toFixed(2)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-600">KDV (%{taxes.vat * 100})</span>
-                <span className="text-lg text-[var(--navy)]">${vat}</span>
+                <span className="text-lg text-[var(--navy)]">
+                  ${vat.toFixed(2)}
+                </span>
               </div>
 
               <div className="flex items-center justify-between py-3 bg-gray-50 rounded-xl px-4">
@@ -435,7 +440,7 @@ export function ProductDetail() {
               </div>
             </div>
 
-            {isLoggedIn ? (
+            {user ? (
               <button
                 onClick={() => navigate(`/checkout/${id}`)}
                 className="w-full bg-[var(--electric-blue)] text-white py-4 rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors text-lg"

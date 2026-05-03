@@ -1,9 +1,29 @@
 import { useState } from "react";
-import { Link } from "react-router";
-import { User, Mail, CreditCard, Shield, Bell, Globe, ChevronRight, Store, LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router";
+import {
+  User,
+  Mail,
+  CreditCard,
+  Shield,
+  Bell,
+  Globe,
+  ChevronRight,
+  Store,
+  LayoutDashboard,
+  Settings,
+  LogOut,
+  X,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export function Profile() {
-  const [userRole, setUserRole] = useState<"buyer" | "seller">("buyer");
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [userRole, setUserRole] = useState<"buyer" | "seller">(
+    (user?.role as "buyer" | "seller") || "buyer",
+  );
+  console.log(setUserRole); // Keep for linter
+
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
     customsAlerts: true,
@@ -11,10 +31,17 @@ export function Profile() {
     newsletter: true,
   });
 
-  console.log(setUserRole);
+  const [activeModal, setActiveModal] = useState<
+    "password" | "twoFactor" | "logout" | null
+  >(null);
 
   const toggleNotification = (key: keyof typeof notifications) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -48,7 +75,7 @@ export function Profile() {
                       <User className="w-5 h-5 text-gray-400" />
                       <input
                         type="text"
-                        defaultValue="Ahmet Yılmaz"
+                        defaultValue={user?.name || ""}
                         className="flex-1 bg-transparent focus:outline-none"
                       />
                     </div>
@@ -62,7 +89,7 @@ export function Profile() {
                       <Mail className="w-5 h-5 text-gray-400" />
                       <input
                         type="email"
-                        defaultValue="ahmet.yilmaz@ornek.com"
+                        defaultValue={user?.email || ""}
                         className="flex-1 bg-transparent focus:outline-none"
                       />
                     </div>
@@ -77,13 +104,10 @@ export function Profile() {
                       <Shield className="w-5 h-5 text-green-600" />
                       <input
                         type="text"
-                        defaultValue="••••••••1234"
+                        defaultValue={user?.citizenId || "Belirtilmemiş"}
                         className="flex-1 bg-transparent focus:outline-none"
                         disabled
                       />
-                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                        Doğrulandı
-                      </span>
                     </div>
                   </div>
 
@@ -324,19 +348,28 @@ export function Profile() {
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="text-lg text-[var(--navy)] mb-4">Güvenlik</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left">
+                <button
+                  onClick={() => setActiveModal("password")}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left"
+                >
                   <Settings className="w-5 h-5 text-gray-600" />
                   <span className="text-sm text-gray-700">
                     Şifreyi Değiştir
                   </span>
                 </button>
-                <button className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left">
+                <button
+                  onClick={() => setActiveModal("twoFactor")}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left"
+                >
                   <Shield className="w-5 h-5 text-gray-600" />
                   <span className="text-sm text-gray-700">
                     İki Aşamalı Doğrulama
                   </span>
                 </button>
-                <button className="w-full flex items-center gap-3 p-3 hover:bg-red-50 rounded-xl transition-colors text-left text-red-600">
+                <button
+                  onClick={() => setActiveModal("logout")}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-red-50 rounded-xl transition-colors text-left text-red-600"
+                >
                   <LogOut className="w-5 h-5" />
                   <span className="text-sm">Çıkış Yap</span>
                 </button>
@@ -345,6 +378,120 @@ export function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {activeModal === "password" && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
+            <button
+              onClick={() => setActiveModal(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-xl font-medium mb-4">Şifreyi Değiştir</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-2 text-sm text-gray-700">
+                  Mevcut Şifre
+                </label>
+                <input
+                  type="password"
+                  placeholder="Mevcut şifreniz"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm text-gray-700">
+                  Yeni Şifre
+                </label>
+                <input
+                  type="password"
+                  placeholder="Yeni şifreniz"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 text-sm text-gray-700">
+                  Yeni Şifre (Tekrar)
+                </label>
+                <input
+                  type="password"
+                  placeholder="Yeni şifrenizi tekrar girin"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-[var(--input-background)] focus:outline-none"
+                />
+              </div>
+              <button
+                onClick={() => setActiveModal(null)}
+                className="w-full py-3 bg-[var(--electric-blue)] text-white rounded-xl hover:bg-[var(--electric-blue-dark)] transition-colors mt-2"
+              >
+                Şifreyi Güncelle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "twoFactor" && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
+            <button
+              onClick={() => setActiveModal(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-xl font-medium mb-4">İki Aşamalı Doğrulama</h3>
+            <p className="text-gray-600 mb-6">
+              Hesabınızı korumak için 2FA özelliğini aktif edin.
+            </p>
+            <div className="space-y-4">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="w-full py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+              >
+                Aktifleştir
+              </button>
+              <button
+                onClick={() => setActiveModal(null)}
+                className="w-full py-3 border border-gray-300 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                İptal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "logout" && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm relative text-center">
+            <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <LogOut className="w-6 h-6 text-red-600" />
+            </div>
+            <h3 className="text-xl font-medium mb-2">
+              Çıkış Yapmak Üzeresiniz
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Devam etmek istediğinize emin misiniz?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="flex-1 py-3 border border-gray-300 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+              >
+                Çıkış Yap
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
