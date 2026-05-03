@@ -94,6 +94,8 @@ export function ExportDocs() {
   const [generating, setGenerating] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
 
+  console.log(products);
+
   const handleGenerate = (orderId: string) => {
     setGenerating(true);
     setSelectedOrder(orderId);

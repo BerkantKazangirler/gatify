@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import Map, { Marker, Source, Layer } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
 import {
   MapPin,
   Package,
@@ -166,7 +168,9 @@ const shipments: Shipment[] = [
 ];
 
 export function Tracking() {
-  const [selectedShipment, setSelectedShipment] = useState<Shipment>(shipments[0]);
+  const [selectedShipment, setSelectedShipment] = useState<Shipment>(
+    shipments[0],
+  );
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   const handleGeneratePetition = () => {
@@ -243,7 +247,7 @@ export function Tracking() {
 
             <div className="aspect-video bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl mb-6 relative overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-full h-full p-8">
+                <div className="relative w-full h-full">
                   <MapRoute
                     origin={selectedShipment.origin}
                     destination={selectedShipment.destination}
@@ -396,6 +400,18 @@ export function Tracking() {
   );
 }
 
+const COORDINATES: Record<string, [number, number]> = {
+  USA: [-95.7129, 37.0902],
+  "USA Warehouse": [-118.2437, 34.0522],
+  "Singapore Port": [103.8198, 1.3521],
+  "Local Customs": [28.9784, 41.0082],
+  "Your City": [32.8597, 39.9334],
+  Japan: [138.2529, 36.2048],
+  "Japan Warehouse": [139.6917, 35.6895],
+  "International Hub": [55.2708, 25.2048],
+  International: [55.2708, 25.2048],
+};
+
 function MapRoute({
   origin,
   destination,
@@ -409,61 +425,78 @@ function MapRoute({
   progress: number;
   hasAlert: boolean;
 }) {
-  console.log({ origin, destination, current, progress, hasAlert });
+  const originCoords = COORDINATES[origin] || [0, 0];
+  const destCoords = COORDINATES[destination] || [0, 0];
+  const currentCoords = COORDINATES[current] || [
+    originCoords[0] + (destCoords[0] - originCoords[0]) * (progress / 100),
+    originCoords[1] + (destCoords[1] - originCoords[1]) * (progress / 100),
+  ];
+
+  const routeData: GeoJSON.Feature<GeoJSON.LineString> = useMemo(() => {
+    return {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [originCoords, currentCoords, destCoords],
+      },
+    };
+  }, [originCoords, currentCoords, destCoords]);
+
   return (
-    <svg className="w-full h-full" viewBox="0 0 400 200">
-      <defs>
-        <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#10b981" />
-          <stop
-            offset={`${progress}%`}
-            stopColor={hasAlert ? "#dc2626" : "#0ea5e9"}
+    <div
+      className="w-full h-full rounded-xl overflow-hidden"
+      style={{ minHeight: "300px" }}
+    >
+      <Map
+        {...({
+          initialViewState: {
+            longitude: currentCoords[0],
+            latitude: currentCoords[1],
+            zoom: 1,
+          },
+        } as any)}
+        mapStyle="mapbox://styles/mapbox/light-v11"
+        mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
+      >
+        <Source id="route" type="geojson" data={routeData}>
+          <Layer
+            id="route-line"
+            type="line"
+            paint={{
+              "line-color": hasAlert ? "#dc2626" : "#0ea5e9",
+              "line-width": 4,
+              "line-dasharray": [2, 2],
+            }}
           />
-          <stop offset={`${progress}%`} stopColor="#e5e7eb" />
-          <stop offset="100%" stopColor="#e5e7eb" />
-        </linearGradient>
-      </defs>
+        </Source>
 
-      <path
-        d="M 50 100 Q 125 60, 200 90 T 350 100"
-        stroke="url(#routeGradient)"
-        strokeWidth="4"
-        fill="none"
-        strokeLinecap="round"
-      />
-
-      <circle cx="50" cy="100" r="8" fill="#10b981" />
-      <text x="50" y="130" textAnchor="middle" fontSize="12" fill="#374151">
-        {origin}
-      </text>
-
-      <circle
-        cx={50 + (300 * progress) / 100}
-        cy={100 + Math.sin((progress / 100) * Math.PI) * -20}
-        r="10"
-        fill={hasAlert ? "#dc2626" : "#0ea5e9"}
-        className="animate-pulse"
-      />
-
-      <circle cx="350" cy="100" r="8" fill="#9333ea" />
-      <text x="350" y="130" textAnchor="middle" fontSize="12" fill="#374151">
-        {destination}
-      </text>
-
-      {hasAlert && (
-        <g>
-          <circle
-            cx={50 + (300 * progress) / 100}
-            cy={100 + Math.sin((progress / 100) * Math.PI) * -20}
-            r="20"
-            fill="none"
-            stroke="#dc2626"
-            strokeWidth="2"
-            opacity="0.5"
-            className="animate-ping"
+        {/* Origin Marker */}
+        <Marker longitude={originCoords[0]} latitude={originCoords[1]}>
+          <div
+            className="bg-green-500 rounded-full w-4 h-4 shadow-lg border-2 border-white"
+            title={origin}
           />
-        </g>
-      )}
-    </svg>
+        </Marker>
+
+        {/* Destination Marker */}
+        <Marker longitude={destCoords[0]} latitude={destCoords[1]}>
+          <div
+            className="bg-purple-600 rounded-full w-4 h-4 shadow-lg border-2 border-white"
+            title={destination}
+          />
+        </Marker>
+
+        {/* Current Location Marker */}
+        <Marker longitude={currentCoords[0]} latitude={currentCoords[1]}>
+          <div
+            className={`rounded-full w-6 h-6 shadow-lg border-2 border-white flex items-center justify-center animate-pulse ${hasAlert ? "bg-red-600" : "bg-blue-500"}`}
+            title={current}
+          >
+            <div className="w-2 h-2 bg-white rounded-full" />
+          </div>
+        </Marker>
+      </Map>
+    </div>
   );
 }

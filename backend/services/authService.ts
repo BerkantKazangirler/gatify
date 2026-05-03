@@ -1,5 +1,15 @@
 import { auth, db } from "../lib/firebase.js";
 
+// Gelen API cevabı için tip tanımı
+interface FirebaseAuthResponse {
+  idToken?: string;
+  localId?: string;
+  email?: string;
+  error?: {
+    message: string;
+  };
+}
+
 export async function registerUser(data: {
   name: string;
   email: string;
@@ -7,14 +17,12 @@ export async function registerUser(data: {
   citizenId: string;
 }) {
   try {
-    // 1. Firebase Auth'ta Kullanıcı Oluştur (Admin SDK)
     const userRecord = await auth.createUser({
       email: data.email,
       password: data.password,
       displayName: data.name,
     });
 
-    // 2. Firestore'da users collection'ına veriyi kaydet (Şifreyi kaydetmiyoruz!)
     const userDoc = {
       uid: userRecord.uid,
       name: data.name,
@@ -24,6 +32,7 @@ export async function registerUser(data: {
       createdAt: new Date().toISOString(),
     };
 
+    // Firebase v12/Admin SDK yazımı
     await db.collection("users").doc(userRecord.uid).set(userDoc);
 
     return userDoc;
@@ -36,12 +45,9 @@ export async function loginUser(email: string, password: string) {
   try {
     const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY;
     if (!FIREBASE_API_KEY) {
-      throw new Error(
-        "FIREBASE_API_KEY ortam değişkeni backend'de tanımlanmamış.",
-      );
+      throw new Error("FIREBASE_API_KEY ortam değişkeni tanımlanmamış.");
     }
 
-    // Admin SDK şifre ile girişi desteklemediği için Firebase Identity Toolkit API kullanılıyor.
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`;
 
     const response = await fetch(url, {
@@ -54,17 +60,22 @@ export async function loginUser(email: string, password: string) {
       }),
     });
 
-    const data = await response.json();
+    // Hatanın çözümü: data değişkenini tip ile tanımlıyoruz
+    const data = (await response.json()) as FirebaseAuthResponse;
 
     if (!response.ok) {
       throw new Error(data.error?.message || "Giriş başarısız.");
     }
 
-    // Firestore'dan kullanıcı detaylarını çek (Eğer giriş başarılıysa uid döner)
+    if (!data.localId) {
+      throw new Error("Kullanıcı ID'si alınamadı.");
+    }
+
+    // Firestore'dan veriyi çek
     const userDoc = await db.collection("users").doc(data.localId).get();
 
     return {
-      token: data.idToken, // JWT Token (Client'ta saklanabilir)
+      token: data.idToken,
       user: userDoc.exists
         ? userDoc.data()
         : { uid: data.localId, email: data.email },

@@ -35,28 +35,28 @@ export function ProductDiscovery() {
     };
   }, []);
 
-  const syncLocalSamples = async () => {
-    for (const p of products) {
-      const payload = {
-        name: p.name,
-        price: p.globalPrice,
-        localPrice: p.localPrice,
-        origin: p.country,
-        photo: p.image,
-        stock: p.stock ?? 10,
-        salerId: "salerTest",
-        categoryId: p.category,
-        description: p.description ?? "",
-      };
-      try {
-        await saveProduct(payload);
-      } catch (err) {
-        console.error("sync failed", err);
-      }
-    }
-    const items = await fetchAllProducts();
-    setProductsList(items);
-  };
+  // const syncLocalSamples = async () => {
+  //   for (const p of products) {
+  //     const payload = {
+  //       name: p.name,
+  //       price: p.globalPrice,
+  //       localPrice: p.localPrice,
+  //       origin: p.country,
+  //       photo: p.image,
+  //       stock: p.stock ?? 10,
+  //       salerId: "salerTest",
+  //       categoryId: p.category,
+  //       description: p.description ?? "",
+  //     };
+  //     try {
+  //       await saveProduct(payload);
+  //     } catch (err) {
+  //       console.error("sync failed", err);
+  //     }
+  //   }
+  //   const items = await fetchAllProducts();
+  //   setProductsList(items);
+  // };
 
   const filteredProducts = productsList.filter((product) => {
     const matchesCategory =
@@ -149,7 +149,7 @@ export function ProductDiscovery() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={syncLocalSamples}
+                // onClick={syncLocalSamples}
                 className="hidden md:inline-flex items-center gap-2 px-3 py-2 border border-border rounded-lg hover:bg-secondary"
               >
                 Örnekleri eşitle

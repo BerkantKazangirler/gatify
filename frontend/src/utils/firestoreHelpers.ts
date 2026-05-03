@@ -1,4 +1,4 @@
-import { requestJson, API_BASE_URL } from "./apiHelpers";
+import { requestJson } from "./apiHelpers";
 
 export type FirestoreProductRecord = {
   id: string;
